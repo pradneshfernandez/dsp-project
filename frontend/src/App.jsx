@@ -144,11 +144,15 @@ const App = () => {
 
   const fetchHistory = async () => {
     try {
-      const resp = await fetch(`${API_BASE}/history`);
-      const data = await resp.json();
-      setHistory(data);
+      console.log("📜 Fetching /api/history...");
+      const resp = await fetch('/api/history');
+      if (resp.ok) {
+        const data = await resp.json();
+        console.log("📚 History loaded:", data.length);
+        setHistory(data);
+      }
     } catch (err) {
-      console.error("Failed to fetch history", err);
+      console.error("History Fetch failed:", err);
     }
   };
 
@@ -180,20 +184,25 @@ const App = () => {
         markdown += `- ${source.data.label} → ${target.data.label} (Safety-Critical Path)\n`;
       }
     });
+    console.log("Serialized Topology:", markdown);
     return markdown;
   };
 
   const handleRun = async () => {
+    console.log("🚀 Engaging Engine. View:", view);
     setError(null);
     setView('processing');
     setRagFeed([]);
     setResults({ tara: null });
 
     const finalSysContent = view === 'designer' ? serializeTopology() : systemText;
+    console.log("📝 System Content length:", finalSysContent.length);
 
     try {
       addFeed("Engaging Deep-Cyber Warp-Stream...");
-      const response = await fetch(`${API_BASE}/analyze_text`, {
+      console.log("🌐 Fetching /api/analyze_text...");
+
+      const response = await fetch('/api/analyze_text', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -201,6 +210,12 @@ const App = () => {
           rubric_content: rubricText,
         }),
       });
+
+      console.log("📡 Response received. Status:", response.status);
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errText}`);
+      }
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -308,7 +323,8 @@ const App = () => {
     setIsChatLoading(true);
 
     try {
-      const resp = await fetch(`${API_BASE}/api/chat`, {
+      console.log("💬 Sending Chat message...");
+      const resp = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

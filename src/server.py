@@ -30,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.get("/api")
 async def root():
     return {"status": "operational", "message": "Streaming TARA API is live."}
 
@@ -71,7 +71,7 @@ class TaraTextRequest(BaseModel):
     system_content: str
     rubric_content: str
 
-@app.post("/analyze")
+@app.post("/api/analyze")
 async def analyze_system(
     system_file: UploadFile = File(...),
     rubric_file: UploadFile = File(...)
@@ -87,7 +87,7 @@ async def analyze_system(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/analyze_text")
+@app.post("/api/analyze_text")
 async def analyze_system_text(request: TaraTextRequest):
     try:
         return StreamingResponse(
