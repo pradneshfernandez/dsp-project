@@ -111,6 +111,58 @@ async def get_history(db: Session = Depends(get_db)):
         logger.error(f"History Fetch Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+from langchain_groq import ChatGroq
+
+class ChatRequest(BaseModel):
+    message: str
+    context: dict
+
+@app.post("/api/chat")
+async def chat_with_analysis(request: ChatRequest):
+    try:
+        groq_key = os.getenv("GROQ_API_KEY")
+        if not groq_key:
+            raise HTTPException(status_code=500, detail="Groq API Key not configured.")
+
+        llm = ChatGroq(
+            groq_api_key=groq_key,
+            model_name="llama-3.1-70b-versatile",
+            temperature=0.2
+        )
+
+        # Prepare context summary
+        tara = request.context
+        system_name = tara.get("system_name", "Unknown System")
+        threats_count = len(tara.get("risk_matrix", []))
+        risk_level = tara.get("risk_level", "Unknown")
+        
+        system_prompt = f"""You are the TARA x01 Neural Intelligence, an automotive cybersecurity expert.
+You are discussing a TARA (Threat Assessment and Remediation Analysis) for the system: {system_name}.
+Current Security Posture:
+- Risk Level: {risk_level}
+- Total Threats Identified: {threats_count}
+
+Context Data (JSON):
+{json.dumps(tara, indent=2)}
+
+Guidelines:
+1. Provide concise, technical, and actionable security advice.
+2. Focus on ISO/SAE 21434 compliance and automotive safety.
+3. Be helpful but maintain a professional 'Cyber-Intelligence' tone.
+"""
+
+        messages = [
+            ("system", system_prompt),
+            ("human", request.message)
+        ]
+
+        response = await asyncio.to_thread(llm.invoke, messages)
+        return {"response": response.content}
+
+    except Exception as e:
+        logger.error(f"Chat Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -129,7 +129,12 @@ const App = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const feedRef = useRef(null);
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     if (feedRef.current) {
@@ -280,6 +285,38 @@ const App = () => {
     setSelectedRisk(null);
   };
 
+  const handleChat = async () => {
+    if (!chatInput.trim() || isChatLoading) return;
+
+    const userMsg = chatInput;
+    setChatInput('');
+    setChatHistory(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsChatLoading(true);
+
+    try {
+      const resp = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMsg,
+          context: results.tara
+        })
+      });
+      const data = await resp.json();
+      setChatHistory(prev => [...prev, { role: 'assistant', content: data.response }]);
+    } catch (err) {
+      setChatHistory(prev => [...prev, { role: 'assistant', content: "Neural Connection Error. Please verify Groq API status." }]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatHistory]);
+
   const onNodeDoubleClick = (_, node) => {
     const newLabel = prompt('Enter new label:', node.data.label);
     if (newLabel) {
@@ -314,7 +351,12 @@ const App = () => {
               {history.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => { setResults({ tara: item.data }); setView('result'); setShowHistory(false); }}
+                  onClick={() => {
+                    setResults({ tara: item.data });
+                    setChatHistory([]); // Clear chat for new context
+                    setView('result');
+                    setShowHistory(false);
+                  }}
                   className="p-4 bg-[#080812] border border-[#c88cae]/10 rounded-2xl hover:border-[#c88cae]/40 transition-all cursor-pointer group"
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -464,7 +506,7 @@ const App = () => {
                     fitView
                     style={{ backgroundColor: '#000' }}
                   >
-                    <Background color="#ffffff" gap={40} size={1} opacity={0.15} variant="grid" />
+                    <Background color="#ffffff" gap={40} size={1} opacity={0.3} variant="dots" />
                     <Controls className="!bg-[#ffffff] !border-[#000000] !fill-[#000000]" />
                     <Panel position="top-right" className="bg-[#ffffff]/10 p-4 rounded-xl border border-[#ffffff]/20 text-[9px] font-mono text-[#ffffff] uppercase tracking-widest backdrop-blur-md">
                       Interactive Simulation Canvas &bull; Monochrome Edition
@@ -697,6 +739,86 @@ const App = () => {
         )}
 
       </AnimatePresence>
+
+      {/* 6. NEURAL INTELLIGENCE CHAT */}
+      {view === 'result' && (
+        <div className="fixed bottom-10 right-80 z-[200] flex flex-col items-end gap-4">
+          <AnimatePresence>
+            {isChatOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="w-96 h-[500px] bg-[#13182a]/95 backdrop-blur-3xl border border-[#c88cae]/30 rounded-[40px] shadow-2xl flex flex-col overflow-hidden"
+              >
+                <div className="p-6 border-b border-[#c88cae]/10 bg-[#c88cae]/5 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#c88cae] animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c88cae]">Neural Intelligence</span>
+                  </div>
+                  <button onClick={() => setIsChatOpen(false)} className="text-[#f7edf4]/40 hover:text-[#c88cae] transition-colors"><X size={16} /></button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                  {chatHistory.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-40">
+                      <Cpu size={32} className="mb-4 text-[#c88cae]" />
+                      <p className="text-[10px] font-mono leading-relaxed uppercase tracking-wider">Analysis context loaded. Ask me about vulnerabilities, threat vectors, or ISO 21434 compliance.</p>
+                    </div>
+                  )}
+                  {chatHistory.map((msg, i) => (
+                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] p-4 rounded-3xl text-[11px] leading-relaxed ${msg.role === 'user' ? 'bg-[#c88cae] text-[#080812] font-bold' : 'bg-[#080812]/60 border border-[#c88cae]/20 text-[#f7edf4]/80'}`}>
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {isChatLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-[#080812]/60 border border-[#c88cae]/20 p-4 rounded-3xl">
+                        <div className="flex gap-1">
+                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce" />
+                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.2s]" />
+                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.4s]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={chatEndRef} />
+                </div>
+
+                <div className="p-6 border-t border-[#c88cae]/10 bg-[#080812]/40 backdrop-blur-md">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleChat()}
+                      placeholder="Query the lattice..."
+                      className="w-full bg-[#13182a] border border-[#c88cae]/20 rounded-full py-4 pl-6 pr-14 text-[11px] font-mono text-[#f7edf4] outline-none focus:border-[#c88cae]/60 transition-all placeholder-[#c88cae]/20"
+                    />
+                    <button
+                      onClick={handleChat}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#c88cae] rounded-full flex items-center justify-center text-[#080812] hover:scale-105 active:scale-95 transition-all shadow-xl"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsChatOpen(!isChatOpen)}
+            className={`w-16 h-16 rounded-[24px] flex items-center justify-center shadow-2xl transition-all duration-500 border-2 ${isChatOpen ? 'bg-[#c88cae] border-white/20 rotate-90' : 'bg-[#13182a]/95 border-[#c88cae]/20'}`}
+          >
+            {isChatOpen ? <X size={24} className="text-[#080812]" /> : <Cpu size={24} className="text-[#c88cae]" />}
+          </motion.button>
+        </div>
+      )}
 
       {/* Global Aesthetics */}
       <div className="fixed top-[-30vh] right-[-10vw] w-[90vw] h-[90vh] bg-[#4b2741]/[0.05] rounded-full blur-[200px] pointer-events-none z-0" />
