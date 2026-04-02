@@ -1,21 +1,15 @@
-streamlit
-pandas
-langchain>=0.1.12
-langchain-openai>=0.0.8
-langchain-community>=0.0.28
-python-dotenv
-pydantic
-chromadb
-sentence-transformers
-plotly
-matplotlib
-reportlab
-fpdf2
-pytest
+# Core Backend
 fastapi
 uvicorn
 python-multipart
+python-dotenv
+pydantic
+
+# LLM Orchestration
 langchain-google-genai
+langchain-core
+
+# Database & Persistence
 sqlalchemy
 psycopg2-binary
 supabase
