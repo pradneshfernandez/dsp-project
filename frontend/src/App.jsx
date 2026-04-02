@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Activity, ChevronRight, AlertCircle, Database, ShieldCheck, Zap, Layers, Cpu, Edit3, History, FileText, X } from 'lucide-react';
 import { Graphviz } from 'graphviz-react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { ReactFlow, Background, Controls, useNodesState, useEdgesState, addEdge, Panel, MarkerType } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -11,8 +10,13 @@ import { NoiseBackground } from './components/ui/noise-background';
 import { WavyBackground } from './components/ui/wavy-background';
 import { LoaderOne } from './components/ui/loader';
 import { Cover } from './components/ui/cover';
-import { LayoutGrid } from './components/ui/layout-grid';
-import { HoverEffect } from './components/ui/card-hover-effect';
+import { PieChart, Pie, Cell, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend } from 'recharts';
+
+const CHART_COLORS = ['#c88cae', '#4CAF50', '#FF4D4D', '#ffcc00', '#00bcd4', '#9c27b0'];
+
+
+// Removed LayoutGrid and Bento Grids in favor of structured data visualizations.
+
 
 export const cyberProjects = [
   { title: "V2X Authentication", description: "Multi-layered cryptographic handshakes for vehicle-to-everything communication boundaries.", link: "#" },
@@ -21,117 +25,6 @@ export const cyberProjects = [
   { title: "Gateway Sandbox", description: "Iso-mapped execution environments for third-party infotainment payloads.", link: "#" },
   { title: "ECU Zero-Trust", description: "Mutual TLS verification for intra-vehicle microservices and controller nodes.", link: "#" },
   { title: "Lidar Spoofing Defense", description: "Sensor fusion redundancy and physical-layer entropy validation.", link: "#" },
-];
-
-function StaticBentoGrid() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full mt-10">
-      <div className="col-span-1 lg:col-span-2 h-full bg-[#c88cae]/10 border border-[#c88cae]/20 min-h-[500px] lg:min-h-[300px] rounded-3xl p-10 relative overflow-hidden group">
-        <div className="max-w-xs relative z-20">
-          <h2 className="text-left text-balance text-xl lg:text-3xl font-black uppercase tracking-widest text-[#f7edf4]">
-            AutoTARA shields the entire automotive software stack
-          </h2>
-          <p className="mt-4 text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
-            With over 1,000,000 simulated attack vectors neutralized, AutoTARA is the most robust compliance platform for modern OEMs.
-          </p>
-        </div>
-        <div className="absolute -right-4 lg:-right-[10%] -bottom-10 opacity-10 group-hover:opacity-30 transition-opacity duration-500">
-          <ShieldCheck size={350} />
-        </div>
-      </div>
-
-      <div className="col-span-1 min-h-[300px] bg-[#13182a] border border-[#c88cae]/20 rounded-3xl p-10 relative overflow-hidden flex flex-col justify-end group">
-        <h2 className="max-w-80 text-left text-balance text-xl lg:text-2xl font-black uppercase tracking-widest text-[#f7edf4]">
-          Zero Trust.<br />Zero Exceptions.<br />Zero Vulnerabilities.
-        </h2>
-        <p className="mt-4 text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
-          If a component falls out of compliance, the entire pathway is quarantined.
-        </p>
-      </div>
-
-      <div className="col-span-1 lg:col-span-3 bg-[#080812]/80 border border-[#c88cae]/20 min-h-[500px] lg:min-h-[300px] xl:min-h-[250px] rounded-3xl p-10 relative overflow-hidden group">
-        <div className="max-w-sm relative z-20">
-          <h2 className="max-w-sm md:max-w-lg text-left text-balance text-xl lg:text-2xl font-black uppercase tracking-widest text-[#f7edf4]">
-            Deploy quantum-resistant algorithmic checks today!
-          </h2>
-          <p className="mt-4 max-w-[26rem] text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
-            Automate ISO/SAE 21434 and UN R155 compliance with our ultra-fast Neural Engine. Stop zero-days before they compile.
-          </p>
-        </div>
-        <div className="absolute -right-10 md:-right-[10%] lg:right-[5%] top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000 flex gap-4">
-          <Database size={250} />
-          <Cpu size={250} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const SkeletonOne = () => (
-  <div>
-    <p className="font-bold md:text-3xl text-xl text-white">Neural Hub Core</p>
-    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">TARA Analysis Center</p>
-    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
-      A centralized diagnostic and threat modeling terminal designed for ISO 21434 compliance.
-    </p>
-  </div>
-);
-
-const SkeletonTwo = () => (
-  <div>
-    <p className="font-bold md:text-3xl text-xl text-white">Visual Architecture</p>
-    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">System Topology</p>
-    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
-      Mapping connected ECUs, Gateways, and sensors to identify critical attack paths.
-    </p>
-  </div>
-);
-
-const SkeletonThree = () => (
-  <div>
-    <p className="font-bold md:text-3xl text-xl text-white">Quantum Sign-off</p>
-    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">Automated Audit</p>
-    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
-      The Chief Auditor verifies safety standards and mitigation parity.
-    </p>
-  </div>
-);
-
-const SkeletonFour = () => (
-  <div>
-    <p className="font-bold md:text-3xl text-xl text-white">Cyber Matrix</p>
-    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">Threat Landscape</p>
-    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
-      Detailed drill-down across identified attack vectors and CVE probabilities.
-    </p>
-  </div>
-);
-
-const uiCards = [
-  {
-    id: 1,
-    content: <SkeletonOne />,
-    className: "md:col-span-2",
-    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=3540&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    content: <SkeletonTwo />,
-    className: "col-span-1",
-    thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=3540&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    content: <SkeletonThree />,
-    className: "col-span-1",
-    thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=3540&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    content: <SkeletonFour />,
-    className: "md:col-span-2",
-    thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=3540&auto=format&fit=crop",
-  },
 ];
 
 class ErrorBoundary extends React.Component {
@@ -279,9 +172,33 @@ const App = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const feedRef = useRef(null);
-  const chatEndRef = useRef(null);
+  const [activeFilter, setActiveFilter] = useState(null);
+
+  // Compute aggregated dynamic chart data from `results.tara`
+  const getAssetDistribution = () => {
+    if (!results.tara?.risk_matrix) return [];
+    const counts = {};
+    results.tara.risk_matrix.forEach(row => {
+      counts[row.asset] = (counts[row.asset] || 0) + 1;
+    });
+    return Object.keys(counts).map(k => ({ name: k, value: counts[k] }));
+  };
+
+  const getRiskScatterData = () => {
+    if (!results.tara?.risk_matrix) return [];
+    return results.tara.risk_matrix.map(row => ({
+      asset: row.asset,
+      threat: row.threat,
+      impact: row.risk_score,
+      feasibility: (Math.random() * 0.5 + 0.5).toFixed(2), // simulated feasibility ratio
+      color: row.hex_color || '#c88cae'
+    }));
+  };
+
+  const filteredMatrix = results.tara?.risk_matrix?.filter(row =>
+    !activeFilter || row.asset === activeFilter
+  );
+
 
   useEffect(() => {
     if (feedRef.current) {
@@ -783,60 +700,128 @@ const App = () => {
                   </div>
                 </div>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-2 gap-8 mb-20">
-                  <div className="p-10 bg-[#080812]/60 rounded-[40px] border border-[#c88cae]/20 text-center group">
-                    <h4 className="text-[10px] text-[#c88cae] uppercase tracking-[0.3em] mb-4 font-bold opacity-60 group-hover:opacity-100 transition-opacity">Threat Vectors Identified</h4>
-                    <p className="text-7xl font-black text-[#f7edf4] tracking-tighter">{results.tara.dashboard_metrics?.total_threats || 0}</p>
+                {/* Vercel-Style Enterprise Dashboard Content */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16">
+                  {/* Left Column: Metrics & Breadcrumbs */}
+                  <div className="xl:col-span-1 flex flex-col gap-8">
+                    {/* Ring Chart Distribution */}
+                    <div className="p-8 bg-[#080812]/80 border border-[#c88cae]/20 rounded-3xl shadow-xl flex flex-col items-center">
+                      <h4 className="flex items-center gap-2 text-[10px] text-[#c88cae] uppercase tracking-[0.2em] w-full border-b border-[#c88cae]/10 pb-4 mb-4 font-bold">
+                        <Activity size={14} /> Threat Mapping Distro
+                      </h4>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={getAssetDistribution()}
+                            cx="50%" cy="50%"
+                            innerRadius={70} outerRadius={90}
+                            padAngle={5} dataKey="value"
+                            onClick={(data) => setActiveFilter(activeFilter === data.name ? null : data.name)}
+                            className="cursor-pointer outline-none"
+                          >
+                            {getAssetDistribution().map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={CHART_COLORS[index % CHART_COLORS.length]}
+                                opacity={activeFilter && activeFilter !== entry.name ? 0.3 : 1}
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip
+                            contentStyle={{ backgroundColor: '#13182a', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '10px' }}
+                            itemStyle={{ color: '#f7edf4', fontSize: '10px', textTransform: 'uppercase' }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <p className="text-[9px] text-[#f7edf4]/40 font-mono uppercase tracking-widest text-center">Click a ring segment to isolate global vulnerabilities</p>
+                    </div>
+
+                    <div className="p-8 bg-[#c88cae]/10 border border-[#c88cae]/30 rounded-3xl flex flex-col justify-end">
+                      <h4 className="flex items-center gap-2 text-[9px] text-[#c88cae] uppercase tracking-[0.2em] font-bold mb-4">
+                        <ShieldCheck size={14} /> Global Assurance
+                      </h4>
+                      <div className="text-[11px] leading-relaxed text-[#f7edf4]/80 font-mono">
+                        {results.tara.audit_summary}
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-10 bg-[#080812]/60 rounded-[40px] border border-[#c88cae]/20 text-center group">
-                    <h4 className="text-[10px] text-[#c88cae] uppercase tracking-[0.3em] mb-4 font-bold opacity-60 group-hover:opacity-100 transition-opacity">Feasibility Probability</h4>
-                    <p className="text-7xl font-black text-[#f7edf4] tracking-tighter">{results.tara.dashboard_metrics?.avg_feasibility || 0.0}</p>
+
+                  {/* Right Column: Scatter Plot / Deep Analysis */}
+                  <div className="xl:col-span-2 p-8 bg-[#080812] border border-[#c88cae]/10 shadow-2xl rounded-3xl relative overflow-hidden flex flex-col">
+                    <h4 className="flex items-center gap-2 text-[10px] text-[#c88cae] uppercase tracking-[0.2em] border-b border-[#c88cae]/10 pb-4 mb-8 font-bold">
+                      <Database size={14} /> Risk Topology Scatter Matrix
+                    </h4>
+
+                    <div className="flex-1 w-full relative min-h-[350px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#c88cae" opacity={0.1} />
+                          <XAxis type="category" dataKey="asset" stroke="#c88cae" tick={{ fill: '#f7edf4', fontSize: 9, opacity: 0.5 }} />
+                          <YAxis type="number" dataKey="impact" name="Risk Impact" stroke="#c88cae" tick={{ fill: '#f7edf4', fontSize: 9, opacity: 0.5 }} />
+                          <RechartsTooltip
+                            cursor={{ strokeDasharray: '3 3' }}
+                            contentStyle={{ backgroundColor: '#13182a', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '10px' }}
+                            labelStyle={{ color: '#c88cae', fontSize: '10px', textTransform: 'uppercase', marginBottom: '5px' }}
+                            itemStyle={{ color: '#f7edf4', fontSize: '10px' }}
+                          />
+                          <Scatter name="Threat Vectors" data={getRiskScatterData()} shape="circle">
+                            {getRiskScatterData().map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={entry.color}
+                                opacity={activeFilter && activeFilter !== entry.asset ? 0.2 : 0.9}
+                              />
+                            ))}
+                          </Scatter>
+                        </ScatterChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {activeFilter && (
+                      <div className="absolute top-8 right-8">
+                        <button
+                          onClick={() => setActiveFilter(null)}
+                          className="bg-[#c88cae]/20 text-[#c88cae] border border-[#c88cae]/50 px-4 py-1.5 rounded-full text-[9px] uppercase tracking-widest font-bold hover:bg-[#c88cae] hover:text-[#080812] transition-colors"
+                        >
+                          Clear Filter: {activeFilter} &times;
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Matrix */}
-                <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-10 flex items-center gap-4"><Zap size={18} /> ISO/SAE 21434 Neural Matrix</h4>
-                <div className="w-full overflow-hidden rounded-[40px] border border-[#c88cae]/20 mb-20 bg-[#080812]/40 backdrop-blur-md">
-                  <table className="w-full text-left font-mono text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-[#13182a]/80 border-b border-[#c88cae]/20">
-                        <th className="p-8 text-[#f7edf4]/60 uppercase tracking-widest text-[10px] font-bold">Neural Asset</th>
-                        <th className="p-8 text-[#f7edf4]/60 uppercase tracking-widest text-[10px] font-bold">Lattice Threat</th>
-                        <th className="p-8 text-[#f7edf4]/60 uppercase tracking-widest text-[10px] font-bold text-center">Score</th>
-                        <th className="p-8 text-[#f7edf4]/60 uppercase tracking-widest text-[10px] font-bold text-center">Protocol</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {results.tara.risk_matrix?.map((row, i) => (
-                        <tr
-                          key={i}
-                          onClick={() => setSelectedRisk(row)}
-                          className="border-b border-[#c88cae]/10 hover:bg-[#c88cae]/5 transition-all last:border-0 group cursor-pointer"
-                        >
-                          <td className="p-8 text-[#f7edf4] font-bold">{row.asset}</td>
-                          <td className="p-8 text-[#f7edf4]/60 italic">{row.threat}</td>
-                          <td className="p-8 text-center font-black text-[#f7edf4] text-2xl">
-                            <motion.span
-                              key={row.risk_score}
-                              initial={{ scale: 1.5, color: '#fff' }}
-                              animate={{ scale: 1, color: '#f7edf4' }}
-                            >
-                              {row.risk_score}
-                            </motion.span>
-                          </td>
-                          <td className="p-8 text-center">
-                            <span
-                              className="px-6 py-2 rounded-full text-[9px] font-black tracking-[0.2em] shadow-2xl inline-block transition-colors duration-1000"
-                              style={{ backgroundColor: row.hex_color || '#c88cae', color: "#080812" }}
-                            >
-                              {row.risk_score > 10 ? 'CRITICAL' : row.risk_score > 5 ? 'ELEVATED' : 'SECURE'}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                {/* Intelligence Ledger (Interactive Data Table) */}
+                <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Layers size={18} /> The Intelligence Ledger</h4>
+                <div className="w-full bg-[#080812]/80 border border-[#c88cae]/20 rounded-3xl overflow-hidden shadow-2xl">
+                  <div className="grid grid-cols-12 bg-[#13182a] border-b border-[#c88cae]/20 p-6 text-[9px] text-[#f7edf4]/60 uppercase tracking-widest font-bold font-mono">
+                    <div className="col-span-3">Asset Target</div>
+                    <div className="col-span-5">Identified Threat</div>
+                    <div className="col-span-2 text-center">Severity</div>
+                    <div className="col-span-2 text-center">Score</div>
+                  </div>
+                  <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
+                    {filteredMatrix?.map((row, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setSelectedRisk(row)}
+                        className="grid grid-cols-12 items-center p-6 border-b border-[#c88cae]/10 hover:bg-[#c88cae]/5 cursor-pointer transition-colors group"
+                      >
+                        <div className="col-span-3 text-[11px] text-[#f7edf4] font-bold tracking-wide truncate pr-4">{row.asset}</div>
+                        <div className="col-span-5 text-[11px] text-[#f7edf4]/70 font-mono truncate pr-4 group-hover:text-[#c88cae] transition-colors">{row.threat}</div>
+                        <div className="col-span-2 flex justify-center">
+                          <span
+                            className="px-3 py-1 rounded-sm text-[8px] font-black tracking-widest uppercase"
+                            style={{ backgroundColor: `${row.hex_color || '#c88cae'}20`, color: row.hex_color || '#c88cae', border: `1px solid ${row.hex_color || '#c88cae'}40` }}
+                          >
+                            {row.risk_score > 10 ? 'CRIT' : row.risk_score > 5 ? 'WARN' : 'INFO'}
+                          </span>
+                        </div>
+                        <div className="col-span-2 text-center text-[12px] font-black text-[#f7edf4]">{row.risk_score}</div>
+                      </div>
+                    ))}
+                    {filteredMatrix?.length === 0 && (
+                      <div className="p-10 text-center text-[#f7edf4]/30 font-mono text-[10px] uppercase tracking-widest">No assets match the active filter.</div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Neural Drill-down Overlay */}
@@ -909,39 +894,7 @@ const App = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Advanced Attack Geometry (Replaces Graphviz) */}
-                <div className="mb-20">
-                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Database size={18} /> Attack Geometry Visualization</h4>
-                  <div className="h-[600px] w-full rounded-[40px] overflow-hidden border border-[#c88cae]/10 bg-[#080812]/40 relative shadow-2xl">
-                    <LayoutGrid cards={uiCards} />
-                  </div>
-                </div>
-
-                {/* Audit Block Full Width */}
-                <div className="mb-32">
-                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><ShieldCheck size={18} /> Chief Audit Decision</h4>
-                  <div className="bg-[#13182a]/80 p-12 rounded-[40px] border-l-8 border-[#c88cae] text-[#f7edf4]/80 text-base leading-loose font-mono shadow-xl">
-                    {results.tara.audit_summary}
-                  </div>
-                  <div className="mt-8 p-8 bg-[#c88cae]/5 rounded-3xl border border-[#c88cae]/20 flex justify-between items-center">
-                    <div>
-                      <p className="text-[9px] font-mono text-[#c88cae] uppercase tracking-[0.4em] mb-2 font-black italic">Neural Integrity Sign-off</p>
-                      <p className="text-[10px] font-mono text-[#f7edf4]/40 uppercase">Models: Gemma 3 (Parallel) &bull; Gemini 3.1 Flash. Compliance: UN R155 & ISO 21434 verified.</p>
-                    </div>
-                    <div className="px-6 py-3 bg-[#c88cae]/20 text-[#c88cae] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#c88cae]/30">Verified & Immutable</div>
-                  </div>
-                </div>
-
-                <div className="mt-32">
-                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-4 flex items-center gap-4 text-center justify-center w-full"><ShieldCheck size={18} /> Threat Vector Analysis Deep-Dive</h4>
-                  <p className="text-center text-[10px] uppercase font-mono text-[#f7edf4]/40 mb-10 tracking-widest">Select an infrastructure anomaly to isolate the signal</p>
-                  <HoverEffect items={cyberProjects} />
-                </div>
-
-                <div className="mt-20">
-                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-4 flex items-center gap-4 text-center justify-center w-full"><Cpu size={18} /> Core Competency Directives</h4>
-                  <StaticBentoGrid />
-                </div>
+                {/* Bottom Spacer */}
 
                 <div className="mt-32 flex justify-center pb-20">
                   <button onClick={() => setView('hub')} className="px-20 py-8 border border-[#c88cae]/40 rounded-full text-[12px] font-black tracking-[0.5em] uppercase hover:bg-[#c88cae] hover:text-[#080812] transition-all transform hover:-translate-y-2 shadow-2xl">Return to Hub</button>
