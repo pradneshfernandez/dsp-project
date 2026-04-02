@@ -117,6 +117,10 @@ async def get_history(db: Session = Depends(get_db)):
         if supabase_key:
             logger.info("🔗 Attempting Supabase History Fetch...")
             data = fetch_supabase_history(limit=10)
+            # Map raw_data to data for frontend compatibility
+            if data:
+                for item in data:
+                    item["data"] = item.get("raw_data")
             logger.info(f"✅ Supabase Fetch Success: {len(data) if data else 0} records.")
             return data
         

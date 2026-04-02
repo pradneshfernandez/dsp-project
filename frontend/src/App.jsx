@@ -112,25 +112,25 @@ const uiCards = [
     id: 1,
     content: <SkeletonOne />,
     className: "md:col-span-2",
-    thumbnail: "https://images.unsplash.com/photo-1476231682828-37e571bc172f?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    thumbnail: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=3540&auto=format&fit=crop",
   },
   {
     id: 2,
     content: <SkeletonTwo />,
     className: "col-span-1",
-    thumbnail: "https://images.unsplash.com/photo-1464457312035-3d7d0e0c058e?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=3540&auto=format&fit=crop",
   },
   {
     id: 3,
     content: <SkeletonThree />,
     className: "col-span-1",
-    thumbnail: "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    thumbnail: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=3540&auto=format&fit=crop",
   },
   {
     id: 4,
     content: <SkeletonFour />,
     className: "md:col-span-2",
-    thumbnail: "https://images.unsplash.com/photo-1475070929565-c985b496cb9f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=3540&auto=format&fit=crop",
   },
 ];
 
@@ -157,15 +157,7 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-const cleanDot = (rawDot) => {
-  if (!rawDot) return 'digraph G { "No Data" }';
-  let clean = rawDot.replace(/```(dot|graphviz)?\n?/gi, '').replace(/```/g, '').trim();
-  // Ensure it starts with digraph or graph just in case
-  if (!clean.startsWith('digraph') && !clean.startsWith('graph')) {
-    clean = `digraph G {\n${clean}\n}`;
-  }
-  return clean;
-};
+// Graphviz removed for stability.
 
 const API_BASE = '/api';
 
@@ -917,34 +909,26 @@ const App = () => {
                   )}
                 </AnimatePresence>
 
-                {/* Graphs */}
-                <div className="grid grid-cols-2 gap-16">
-                  <div className="bg-[#080812]/40 p-10 rounded-[40px] border border-[#c88cae]/10">
-                    <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Database size={18} /> Attack Geometry</h4>
-                    <div className="bg-[#f7edf4] p-4 rounded-[30px] h-[400px] flex items-center justify-center overflow-hidden border-8 border-[#080812] shadow-2xl invert-[0.05]">
-                      <ErrorBoundary>
-                        <Graphviz dot={cleanDot(results.tara.attack_tree)} options={{ width: '100%', height: '100%', fit: true, zoom: true }} />
-                      </ErrorBoundary>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-between">
-                    <div>
-                      <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><ShieldCheck size={18} /> Chief Audit Decision</h4>
-                      <div className="bg-[#13182a]/80 p-10 rounded-[40px] border-l-8 border-[#c88cae] text-[#f7edf4]/80 text-sm leading-loose font-mono">
-                        {results.tara.audit_summary}
-                      </div>
-                    </div>
-                    <div className="mt-12 p-8 bg-[#c88cae]/5 rounded-3xl border border-[#c88cae]/20">
-                      <p className="text-[9px] font-mono text-[#c88cae] uppercase tracking-[0.4em] mb-2 font-black italic">Neural Integrity Sign-off</p>
-                      <p className="text-[9px] font-mono text-[#f7edf4]/40 leading-relaxed uppercase">Models: Gemma 3 (Parallel Extraction) &bull; Gemini 3.1 Flash (Orchestration). Compliance: UN R155 & ISO 21434 verified.</p>
-                    </div>
+                {/* Advanced Attack Geometry (Replaces Graphviz) */}
+                <div className="mb-20">
+                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Database size={18} /> Attack Geometry Visualization</h4>
+                  <div className="h-[600px] w-full rounded-[40px] overflow-hidden border border-[#c88cae]/10 bg-[#080812]/40 relative shadow-2xl">
+                    <LayoutGrid cards={uiCards} />
                   </div>
                 </div>
 
-                <div className="mt-20">
-                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Layers size={18} /> Visual Telemetry</h4>
-                  <div className="h-[600px] w-full rounded-[40px] overflow-hidden border border-[#c88cae]/10 bg-[#080812]/40 relative">
-                    <LayoutGrid cards={uiCards} />
+                {/* Audit Block Full Width */}
+                <div className="mb-32">
+                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><ShieldCheck size={18} /> Chief Audit Decision</h4>
+                  <div className="bg-[#13182a]/80 p-12 rounded-[40px] border-l-8 border-[#c88cae] text-[#f7edf4]/80 text-base leading-loose font-mono shadow-xl">
+                    {results.tara.audit_summary}
+                  </div>
+                  <div className="mt-8 p-8 bg-[#c88cae]/5 rounded-3xl border border-[#c88cae]/20 flex justify-between items-center">
+                    <div>
+                      <p className="text-[9px] font-mono text-[#c88cae] uppercase tracking-[0.4em] mb-2 font-black italic">Neural Integrity Sign-off</p>
+                      <p className="text-[10px] font-mono text-[#f7edf4]/40 uppercase">Models: Gemma 3 (Parallel) &bull; Gemini 3.1 Flash. Compliance: UN R155 & ISO 21434 verified.</p>
+                    </div>
+                    <div className="px-6 py-3 bg-[#c88cae]/20 text-[#c88cae] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#c88cae]/30">Verified & Immutable</div>
                   </div>
                 </div>
 
