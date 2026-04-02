@@ -12,8 +12,14 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = None
+SessionLocal = None
+
+try:
+    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+except Exception as e:
+    print(f"⚠️ DATABASE ENGINE INITIALIZATION DELAYED/FAILED: {str(e)}")
 
 Base = declarative_base()
 
@@ -30,9 +36,12 @@ class AnalysisResult(Base):
     raw_data = Column(JSON)  # Stores the full JSON response from the orchestrator
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    if engine:
+        Base.metadata.create_all(bind=engine)
 
 def get_db():
+    if not SessionLocal:
+        return
     db = SessionLocal()
     try:
         yield db
