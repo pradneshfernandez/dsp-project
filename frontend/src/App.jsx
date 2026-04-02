@@ -174,7 +174,7 @@ const App = () => {
   const serializeTopology = () => {
     let markdown = "## Automotive System Topology\n";
     nodes.forEach(node => {
-      markdown += `- **${node.data.label}** (${node.type.toUpperCase()}): located at [${Math.round(node.position.x)}, ${Math.round(node.position.y)}].\n`;
+      markdown += `- **${node.data.label}** (${(node.type || 'node').toUpperCase()}): located at [${Math.round(node.position.x)}, ${Math.round(node.position.y)}].\n`;
     });
     markdown += "\n## Communication Pathways\n";
     edges.forEach(edge => {
@@ -269,7 +269,7 @@ const App = () => {
       id,
       type,
       position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: `${type.toUpperCase()} ${nodes.length + 1}` },
+      data: { label: `${(type || 'node').toUpperCase()} ${nodes.length + 1}` },
       style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold', boxShadow: '0 0 15px rgba(80, 255, 171, 0.2)' }
     };
     setNodes((nds) => nds.concat(newNode));
