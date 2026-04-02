@@ -101,12 +101,19 @@ from src.pipeline.supabase_client import fetch_history as fetch_supabase_history
 
 @app.get("/api/history")
 async def get_history(db: Session = Depends(get_db)):
+    """Fetches analysis history with deep diagnostic trace."""
+    logger.info("🛰️ History Request Received.")
     try:
         # 1. Try Supabase first if configured
-        if os.getenv("SUPABASE_KEY"):
-            return fetch_supabase_history(limit=10)
+        supabase_key = os.getenv("SUPABASE_KEY")
+        if supabase_key:
+            logger.info("🔗 Attempting Supabase History Fetch...")
+            data = fetch_supabase_history(limit=10)
+            logger.info(f"✅ Supabase Fetch Success: {len(data) if data else 0} records.")
+            return data
         
         # 2. Fallback to local SQLAlchemy/SQLite
+        logger.info("🏠 Falling back to Local SQLite...")
         results = db.query(AnalysisResult).order_by(AnalysisResult.timestamp.desc()).limit(10).all()
         return [
             {
@@ -119,8 +126,9 @@ async def get_history(db: Session = Depends(get_db)):
             } for r in results
         ]
     except Exception as e:
-        logger.error(f"History Fetch Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"❌ CRITICAL HISTORY ERROR: {str(e)}")
+        # Return a safe empty list but log the hell out of it
+        return []
 
 from langchain_groq import ChatGroq
 

@@ -172,19 +172,43 @@ const App = () => {
 
   // --- SERIALIZATION ---
   const serializeTopology = () => {
+    console.log("🛠️ Serialization Initiated. Logic check...");
     let markdown = "## Automotive System Topology\n";
-    nodes.forEach(node => {
-      markdown += `- **${node.data.label}** (${(node.type || 'node').toUpperCase()}): located at [${Math.round(node.position.x)}, ${Math.round(node.position.y)}].\n`;
-    });
-    markdown += "\n## Communication Pathways\n";
-    edges.forEach(edge => {
-      const source = nodes.find(n => n.id === edge.source);
-      const target = nodes.find(n => n.id === edge.target);
-      if (source && target) {
-        markdown += `- ${source.data.label} → ${target.data.label} (Safety-Critical Path)\n`;
+
+    if (!nodes || nodes.length === 0) {
+      console.warn("⚠️ No nodes detected in topology.");
+      return "Empty Topology";
+    }
+
+    nodes.forEach((node, i) => {
+      try {
+        const label = node?.data?.label || `UNNAMED_${i}`;
+        const type = (node?.type || 'node').toUpperCase();
+        const x = Math.round(node?.position?.x || 0);
+        const y = Math.round(node?.position?.y || 0);
+
+        markdown += `- **${label}** (${type}): located at [${x}, ${y}].\n`;
+      } catch (err) {
+        console.error("❌ Node Serialization Error:", err, node);
       }
     });
-    console.log("Serialized Topology:", markdown);
+
+    markdown += "\n## Communication Pathways\n";
+    if (edges && edges.length > 0) {
+      edges.forEach(edge => {
+        try {
+          const source = nodes.find(n => n.id === edge.source);
+          const target = nodes.find(n => n.id === edge.target);
+          if (source && target) {
+            markdown += `- ${source.data?.label || 'Source'} → ${target.data?.label || 'Target'} (Safety-Critical Path)\n`;
+          }
+        } catch (err) {
+          console.error("❌ Edge Serialization Error:", err, edge);
+        }
+      });
+    }
+
+    console.log("📦 Topology Serialized. Markdown Len:", markdown.length);
     return markdown;
   };
 
