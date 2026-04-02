@@ -14,6 +14,12 @@ load_dotenv()
 from src.pipeline.orchestrator import run_parallel_orchestrator
 from src.pipeline.models import init_db, get_db, AnalysisResult
 
+# --- SETUP ---
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="TARA x 01 API")
+
 # Initialize DB in startup event
 @app.on_event("startup")
 async def startup_event():
@@ -24,14 +30,9 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Database Initialization Failed: {str(e)}")
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-app = FastAPI(title="TARA x 01 API")
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, you might want to restrict this to your specific Vercel domain
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
