@@ -35,43 +35,36 @@ async def root():
     return {"status": "operational", "message": "Streaming TARA API is live."}
 
 async def tara_stream_generator(sys_content: str, rubric_content: str):
-    """Generates TARA results stage by stage with real-time progress relay."""
+    """Generates TARA results with immediate async relay for Vercel."""
     queue = asyncio.Queue()
 
     def progress_callback(msg, progress):
-        # We use a thread-safe way to put items in the async queue
-        loop.call_soon_threadsafe(queue.put_nowait, {"stage": "orchestrating", "message": f"[{progress}%] {msg}"})
-
-    loop = asyncio.get_event_loop()
-    
-    # Run orchestrator in a background thread
-    orchestrator_task = asyncio.to_thread(run_parallel_orchestrator, sys_content, progress_callback)
+        # Direct put since we are in the same loop now
+        queue.put_nowait({"stage": "orchestrating", "message": f"[{progress}%] {msg}"})
 
     try:
         yield json.dumps({"stage": "init", "message": "Neural Lattice Engaged."}) + "\n"
         
-        # Start the orchestrator
-        task = asyncio.create_task(orchestrator_task)
+        # Start the async orchestrator
+        task = asyncio.create_task(run_parallel_orchestrator(sys_content, progress_callback))
 
-        # Monitor the queue while the task is running
+        # Monitor queue and task status
         while not task.done() or not queue.empty():
             try:
-                # Wait for a message with a short timeout to keep checking task status
-                chunk = await asyncio.wait_for(queue.get(), timeout=0.1)
-                yield json.dumps(chunk) + "\n"
-            except asyncio.TimeoutError:
-                continue
+                # Polling for progress updates
+                if not queue.empty():
+                    chunk = queue.get_nowait()
+                    yield json.dumps(chunk) + "\n"
+                await asyncio.sleep(0.1) # Yield control
+            except Exception:
+                break
 
-        # Get final data
+        # Final result
         json_data = await task
         yield json.dumps({"stage": "orchestrator_complete", "data": json_data}) + "\n"
 
     except Exception as e:
-        logger.error(f"Pipeline Error: {str(e)}")
-        yield json.dumps({"stage": "error", "detail": str(e)}) + "\n"
-
-    except Exception as e:
-        logger.error(f"Pipeline Error: {str(e)}")
+        logger.error(f"Critical Stream Error: {str(e)}")
         yield json.dumps({"stage": "error", "detail": str(e)}) + "\n"
 
 class TaraTextRequest(BaseModel):

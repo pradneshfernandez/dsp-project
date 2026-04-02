@@ -8,8 +8,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 logger = logging.getLogger(__name__)
 
-# Preferred model stack for 2026
-MODELS = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-pro"]
+# Preferred model stack for 2026-Ready Production (Gemini 2.5 Flagship)
+MODELS = ["gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 _current_model_index = 0
 
 def get_llm(temperature: float = 0.2):
