@@ -12,5 +12,5 @@ langchain-core
 
 # Database & Persistence
 sqlalchemy
-psycopg2-binary
+pg8000
 supabase
