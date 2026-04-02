@@ -99,11 +99,6 @@ Return JSON ONLY. No markdown.
         return data
 
     except Exception as e:
-        # Fallback to prevent stall
-        return {
-          "header": {"system_name": "Neural Fallback Connection", "risk_level": "HIGH"},
-          "dashboard_metrics": {"total_threats": 1, "avg_feasibility": 1.0},
-          "risk_matrix": [{"asset": "Logic", "threat": "Parsing Stall", "risk_score": 15, "hex_color": "#FF4D4D"}],
-          "attack_tree": 'digraph G { error -> fallback; }',
-          "audit_summary": f"Connection Interrupted: {str(e)}. Stability fallback engaged."
-        }
+        logger.error(f"Neural Orchestration Fatal Error: {str(e)}")
+        # Raise it so server.py can send stage: "error"
+        raise Exception(f"Neural Engine Failover: {str(e)}")

@@ -219,23 +219,31 @@ const App = () => {
             if (chunk.stage === "orchestrating") {
               addFeed(chunk.message);
             } else if (chunk.stage === "orchestrator_complete") {
-              if (chunk.data) {
+              if (chunk.data && !chunk.data.error) {
                 setResults(prev => ({ ...prev, tara: chunk.data }));
                 addFeed("📦 Neural Topology Captured.");
                 fetchHistory();
                 setTimeout(() => { setView('result'); }, 800);
+              } else {
+                throw new Error(chunk.data?.error || "Neural Engine integrity failure.");
               }
             } else if (chunk.stage === "error") {
-              setError(chunk.detail);
+              console.error("Backend Error Stage:", chunk.detail);
+              setError(`Neural Breakdown: ${chunk.detail}`);
               setView('hub');
             }
           } catch (e) {
-            console.error("Malformed Stream Chunk:", line);
+            console.error("Malformed Stream Chunk or Logic Error:", e, line);
+            if (line.includes('"stage":"error"')) {
+              setError(`Neural Breakdown: ${line}`);
+              setView('hub');
+            }
           }
         }
       }
     } catch (err) {
-      setError(err.message);
+      console.error("Fetch Error:", err);
+      setError(`Stream Interrupted: ${err.message}`);
       setView('hub');
     }
   };
