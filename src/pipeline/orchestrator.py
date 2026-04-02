@@ -90,18 +90,16 @@ Constraints:
     if progress_callback: progress_callback("Generating JSON output...", 80)
     
     response = (prompt | llm).invoke({"sys_content": sys_content})
+    # Clean up markdown and extract JSON block
     raw_json = response.content.strip()
     
-    # Clean up markdown if LLM includes it
-    if raw_json.startswith("```json"):
-        raw_json = raw_json[7:]
-    if raw_json.startswith("```"):
-        raw_json = raw_json[3:]
-    if raw_json.endswith("```"):
-        raw_json = raw_json[:-3]
+    # Use regex to find the first '{' and last '}'
+    match = re.search(r'(\{.*\})', raw_json, re.DOTALL)
+    if match:
+        raw_json = match.group(1)
         
     try:
-        data = json.loads(raw_json.strip())
+        data = json.loads(raw_json)
         
         # Save to Database
         try:

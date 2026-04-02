@@ -214,17 +214,23 @@ const App = () => {
         buffer = lines.pop();
         for (const line of lines) {
           if (!line.trim()) continue;
-          const chunk = JSON.parse(line);
-          if (chunk.stage === "orchestrating") {
-            addFeed(chunk.message);
-          } else if (chunk.stage === "orchestrator_complete") {
-            setResults(prev => ({ ...prev, tara: chunk.data }));
-            addFeed("TARA protocol finalized.");
-            fetchHistory();
-            setTimeout(() => { setView('result'); }, 500);
-          } else if (chunk.stage === "error") {
-            setError(chunk.detail);
-            setView('hub');
+          try {
+            const chunk = JSON.parse(line);
+            if (chunk.stage === "orchestrating") {
+              addFeed(chunk.message);
+            } else if (chunk.stage === "orchestrator_complete") {
+              if (chunk.data) {
+                setResults(prev => ({ ...prev, tara: chunk.data }));
+                addFeed("📦 Neural Topology Captured.");
+                fetchHistory();
+                setTimeout(() => { setView('result'); }, 800);
+              }
+            } else if (chunk.stage === "error") {
+              setError(chunk.detail);
+              setView('hub');
+            }
+          } catch (e) {
+            console.error("Malformed Stream Chunk:", line);
           }
         }
       }
