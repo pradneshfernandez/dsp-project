@@ -12,6 +12,39 @@ import { WavyBackground } from './components/ui/wavy-background';
 import { LoaderOne } from './components/ui/loader';
 import { Cover } from './components/ui/cover';
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#080812] text-[#f7edf4]/60 font-mono text-[10px] text-center border border-red-500/20 rounded-[30px]">
+          <AlertCircle size={32} className="text-red-500/80 mb-4" />
+          <p className="text-red-500 uppercase tracking-[0.2em] mb-2 font-bold">Neural Geometry Rendering Failure</p>
+          <p className="opacity-70 mb-4">{this.state.error?.message}</p>
+          <p className="opacity-50">The generated Graphviz layer contained an asynchronous syntax anomaly.</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const cleanDot = (rawDot) => {
+  if (!rawDot) return 'digraph G { "No Data" }';
+  let clean = rawDot.replace(/```(dot|graphviz)?\n?/gi, '').replace(/```/g, '').trim();
+  // Ensure it starts with digraph or graph just in case
+  if (!clean.startsWith('digraph') && !clean.startsWith('graph')) {
+    clean = `digraph G {\n${clean}\n}`;
+  }
+  return clean;
+};
+
 const API_BASE = '/api';
 
 const PRESETS = {
@@ -767,7 +800,9 @@ const App = () => {
                   <div className="bg-[#080812]/40 p-10 rounded-[40px] border border-[#c88cae]/10">
                     <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Database size={18} /> Attack Geometry</h4>
                     <div className="bg-[#f7edf4] p-4 rounded-[30px] h-[400px] flex items-center justify-center overflow-hidden border-8 border-[#080812] shadow-2xl invert-[0.05]">
-                      <Graphviz dot={results.tara.attack_tree} options={{ width: '100%', height: '100%', fit: true, zoom: true }} />
+                      <ErrorBoundary>
+                        <Graphviz dot={cleanDot(results.tara.attack_tree)} options={{ width: '100%', height: '100%', fit: true, zoom: true }} />
+                      </ErrorBoundary>
                     </div>
                   </div>
                   <div className="flex flex-col justify-between">
