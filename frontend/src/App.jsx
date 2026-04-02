@@ -7,10 +7,8 @@ import '@xyflow/react/dist/style.css';
 
 import { EncryptedText } from './components/ui/encrypted-text';
 import { NoiseBackground } from './components/ui/noise-background';
-import { WavyBackground } from './components/ui/wavy-background';
-import { LoaderOne } from './components/ui/loader';
-import { Cover } from './components/ui/cover';
 import { PieChart, Pie, Cell, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend } from 'recharts';
+import ResultDashboard from './components/ResultDashboard';
 
 const CHART_COLORS = ['#c88cae', '#4CAF50', '#FF4D4D', '#ffcc00', '#00bcd4', '#9c27b0'];
 
@@ -172,36 +170,8 @@ const App = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const [activeFilter, setActiveFilter] = useState(null);
   const feedRef = useRef(null);
   const chatEndRef = useRef(null);
-
-  // Compute aggregated dynamic chart data from `results.tara`
-  const getAssetDistribution = () => {
-    if (!results.tara?.risk_matrix) return [];
-    const counts = {};
-    results.tara.risk_matrix.forEach(row => {
-      counts[row.asset] = (counts[row.asset] || 0) + 1;
-    });
-    return Object.keys(counts).map(k => ({ name: k, value: counts[k] }));
-  };
-
-  const getRiskScatterData = () => {
-    if (!results.tara?.risk_matrix) return [];
-    return results.tara.risk_matrix.map(row => ({
-      asset: row.asset,
-      threat: row.threat,
-      impact: row.risk_score,
-      feasibility: (Math.random() * 0.5 + 0.5).toFixed(2), // simulated feasibility ratio
-      color: row.hex_color || '#c88cae'
-    }));
-  };
-
-  const filteredMatrix = results.tara?.risk_matrix?.filter(row =>
-    !activeFilter || row.asset === activeFilter
-  );
-
 
   useEffect(() => {
     if (feedRef.current) {
@@ -676,318 +646,96 @@ const App = () => {
 
         {/* VIEW 5: RESULT */}
         {view === 'result' && results.tara && (
-          <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="min-h-screen w-full flex flex-col items-center px-10 pt-20 pb-40 overflow-y-auto">
-            <div className="w-full max-w-5xl">
-              <div className="mb-10 flex justify-between items-center">
-                <button onClick={() => setView('hub')} className="text-[10px] font-mono text-[#c88cae]/40 hover:text-[#c88cae] uppercase tracking-[0.3em]">&larr; Cluster Overview</button>
-                <div className="text-right">
-                  <p className="text-[10px] font-mono text-[#c88cae] uppercase tracking-[0.3em]">{new Date().toLocaleTimeString()}</p>
-                </div>
-              </div>
-
-              <div className="bg-[#13182a]/40 p-16 rounded-[60px] border border-[#c88cae]/10 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-                {/* Decorative */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-[#c88cae]/[0.02] rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-
-                {/* Header */}
-                <div className="text-center mb-20">
-                  <span className="text-[10px] font-mono text-[#c88cae] uppercase tracking-[0.6em] mb-4 block">Audit Response Verified</span>
-                  <h2 className="text-7xl font-black tracking-tighter text-[#f7edf4] mb-6 uppercase">
-                    {results.tara.header?.system_name || "Neural Topology"}
-                  </h2>
-                  <div className="inline-flex items-center gap-4 px-10 py-3 border-2 border-[#FF4D4D]/30 bg-[#FF4D4D]/10 rounded-full">
-                    <ShieldCheck size={20} className="text-[#FF4D4D]" />
-                    <h3 className="text-2xl font-black text-[#FF4D4D] uppercase tracking-[0.2em]">
-                      {results.tara.header?.risk_level || "CRITICAL"}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Vercel-Style Enterprise Dashboard Content */}
-                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-16">
-                  {/* Left Column: Metrics & Breadcrumbs */}
-                  <div className="xl:col-span-1 flex flex-col gap-8">
-                    {/* Ring Chart Distribution */}
-                    <div className="p-8 bg-[#080812]/80 border border-[#c88cae]/20 rounded-3xl shadow-xl flex flex-col items-center">
-                      <h4 className="flex items-center gap-2 text-[10px] text-[#c88cae] uppercase tracking-[0.2em] w-full border-b border-[#c88cae]/10 pb-4 mb-4 font-bold">
-                        <Activity size={14} /> Threat Mapping Distro
-                      </h4>
-                      <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                          <Pie
-                            data={getAssetDistribution()}
-                            cx="50%" cy="50%"
-                            innerRadius={70} outerRadius={90}
-                            padAngle={5} dataKey="value"
-                            onClick={(data) => setActiveFilter(activeFilter === data.name ? null : data.name)}
-                            className="cursor-pointer outline-none"
-                          >
-                            {getAssetDistribution().map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={CHART_COLORS[index % CHART_COLORS.length]}
-                                opacity={activeFilter && activeFilter !== entry.name ? 0.3 : 1}
-                              />
-                            ))}
-                          </Pie>
-                          <RechartsTooltip
-                            contentStyle={{ backgroundColor: '#13182a', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '10px' }}
-                            itemStyle={{ color: '#f7edf4', fontSize: '10px', textTransform: 'uppercase' }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <p className="text-[9px] text-[#f7edf4]/40 font-mono uppercase tracking-widest text-center">Click a ring segment to isolate global vulnerabilities</p>
-                    </div>
-
-                    <div className="p-8 bg-[#c88cae]/10 border border-[#c88cae]/30 rounded-3xl flex flex-col justify-end">
-                      <h4 className="flex items-center gap-2 text-[9px] text-[#c88cae] uppercase tracking-[0.2em] font-bold mb-4">
-                        <ShieldCheck size={14} /> Global Assurance
-                      </h4>
-                      <div className="text-[11px] leading-relaxed text-[#f7edf4]/80 font-mono">
-                        {results.tara.audit_summary}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right Column: Scatter Plot / Deep Analysis */}
-                  <div className="xl:col-span-2 p-8 bg-[#080812] border border-[#c88cae]/10 shadow-2xl rounded-3xl relative overflow-hidden flex flex-col">
-                    <h4 className="flex items-center gap-2 text-[10px] text-[#c88cae] uppercase tracking-[0.2em] border-b border-[#c88cae]/10 pb-4 mb-8 font-bold">
-                      <Database size={14} /> Risk Topology Scatter Matrix
-                    </h4>
-
-                    <div className="flex-1 w-full relative min-h-[350px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: -20 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#c88cae" opacity={0.1} />
-                          <XAxis type="category" dataKey="asset" stroke="#c88cae" tick={{ fill: '#f7edf4', fontSize: 9, opacity: 0.5 }} />
-                          <YAxis type="number" dataKey="impact" name="Risk Impact" stroke="#c88cae" tick={{ fill: '#f7edf4', fontSize: 9, opacity: 0.5 }} />
-                          <RechartsTooltip
-                            cursor={{ strokeDasharray: '3 3' }}
-                            contentStyle={{ backgroundColor: '#13182a', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '10px' }}
-                            labelStyle={{ color: '#c88cae', fontSize: '10px', textTransform: 'uppercase', marginBottom: '5px' }}
-                            itemStyle={{ color: '#f7edf4', fontSize: '10px' }}
-                          />
-                          <Scatter name="Threat Vectors" data={getRiskScatterData()} shape="circle">
-                            {getRiskScatterData().map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={entry.color}
-                                opacity={activeFilter && activeFilter !== entry.asset ? 0.2 : 0.9}
-                              />
-                            ))}
-                          </Scatter>
-                        </ScatterChart>
-                      </ResponsiveContainer>
-                    </div>
-                    {activeFilter && (
-                      <div className="absolute top-8 right-8">
-                        <button
-                          onClick={() => setActiveFilter(null)}
-                          className="bg-[#c88cae]/20 text-[#c88cae] border border-[#c88cae]/50 px-4 py-1.5 rounded-full text-[9px] uppercase tracking-widest font-bold hover:bg-[#c88cae] hover:text-[#080812] transition-colors"
-                        >
-                          Clear Filter: {activeFilter} &times;
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Intelligence Ledger (Interactive Data Table) */}
-                <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Layers size={18} /> The Intelligence Ledger</h4>
-                <div className="w-full bg-[#080812]/80 border border-[#c88cae]/20 rounded-3xl overflow-hidden shadow-2xl">
-                  <div className="grid grid-cols-12 bg-[#13182a] border-b border-[#c88cae]/20 p-6 text-[9px] text-[#f7edf4]/60 uppercase tracking-widest font-bold font-mono">
-                    <div className="col-span-3">Asset Target</div>
-                    <div className="col-span-5">Identified Threat</div>
-                    <div className="col-span-2 text-center">Severity</div>
-                    <div className="col-span-2 text-center">Score</div>
-                  </div>
-                  <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-                    {filteredMatrix?.map((row, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setSelectedRisk(row)}
-                        className="grid grid-cols-12 items-center p-6 border-b border-[#c88cae]/10 hover:bg-[#c88cae]/5 cursor-pointer transition-colors group"
-                      >
-                        <div className="col-span-3 text-[11px] text-[#f7edf4] font-bold tracking-wide truncate pr-4">{row.asset}</div>
-                        <div className="col-span-5 text-[11px] text-[#f7edf4]/70 font-mono truncate pr-4 group-hover:text-[#c88cae] transition-colors">{row.threat}</div>
-                        <div className="col-span-2 flex justify-center">
-                          <span
-                            className="px-3 py-1 rounded-sm text-[8px] font-black tracking-widest uppercase"
-                            style={{ backgroundColor: `${row.hex_color || '#c88cae'}20`, color: row.hex_color || '#c88cae', border: `1px solid ${row.hex_color || '#c88cae'}40` }}
-                          >
-                            {row.risk_score > 10 ? 'CRIT' : row.risk_score > 5 ? 'WARN' : 'INFO'}
-                          </span>
-                        </div>
-                        <div className="col-span-2 text-center text-[12px] font-black text-[#f7edf4]">{row.risk_score}</div>
-                      </div>
-                    ))}
-                    {filteredMatrix?.length === 0 && (
-                      <div className="p-10 text-center text-[#f7edf4]/30 font-mono text-[10px] uppercase tracking-widest">No assets match the active filter.</div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Neural Drill-down Overlay */}
-                <AnimatePresence>
-                  {selectedRisk && (
-                    <motion.div
-                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="fixed inset-0 z-[300] flex items-center justify-center p-20 bg-[#080812]/80 backdrop-blur-xl"
-                    >
-                      <motion.div
-                        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-                        className="bg-[#13182a] border border-[#c88cae]/20 rounded-[60px] p-16 max-w-3xl w-full relative shadow-2xl overflow-hidden"
-                      >
-                        {/* Decorative Background */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#c88cae]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
-
-                        <button onClick={() => setSelectedRisk(null)} className="absolute top-10 right-10 text-[#f7edf4]/40 hover:text-[#c88cae]"><X size={24} /></button>
-
-                        <div className="mb-12">
-                          <span className="text-[10px] font-mono text-[#c88cae] uppercase tracking-[0.5em] mb-4 block">Neural Drill-down</span>
-                          <h3 className="text-4xl font-black tracking-tighter mb-4 uppercase">{selectedRisk.asset} <span className="text-[#c88cae]/40">&bull;</span> {selectedRisk.threat}</h3>
-                          <div className="flex gap-4 items-center">
-                            <div className="px-4 py-1 bg-[#c88cae]/10 border border-[#c88cae]/20 rounded-full text-[10px] font-mono text-[#c88cae] uppercase tracking-widest">
-                              Score: {selectedRisk.risk_score}
-                            </div>
-                            {selectedRisk.applied && (
-                              <div className="flex items-center gap-2 text-[#4CAF50] text-[10px] font-bold uppercase tracking-widest">
-                                <ShieldCheck size={14} /> Mitigation Active
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-10">
-                          <div>
-                            <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.3em] mb-4 flex items-center gap-3"><Layers size={16} /> Asset Vulnerability</h4>
-                            <p className="text-[#f7edf4]/60 text-sm leading-relaxed font-mono bg-[#080812]/40 p-6 rounded-3xl border border-[#c88cae]/5">
-                              {selectedRisk.description || "Synthesizing deep architecture analysis... This threat targets the internal communication bus of the specified asset, potentially allowing unauthorized command injection or state manipulation."}
-                            </p>
-                          </div>
-
-                          {!selectedRisk.applied ? (
-                            <div className="p-10 bg-[#c88cae]/5 border border-[#c88cae]/20 rounded-[40px]">
-                              <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.3em] mb-6 flex items-center gap-3"><Zap size={16} /> Suggested Neural Patch</h4>
-                              <p className="text-[#f7edf4] text-sm font-bold mb-8">{selectedRisk.mitigation || "Implement hardware-backed cryptographic signatures (AES-GCM 256) for all control messages."}</p>
-
-                              <button
-                                onClick={() => applyMitigation(selectedRisk)}
-                                disabled={isApplying}
-                                className="w-full py-6 bg-[#c88cae] text-[#080812] rounded-[30px] font-black uppercase tracking-[0.3em] text-xs hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 group"
-                              >
-                                {isApplying ? (
-                                  <>Applying Neural Patch <div className="w-4 h-4 border-2 border-[#080812] border-t-transparent rounded-full animate-spin" /></>
-                                ) : (
-                                  <>Apply Countermeasure <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" /></>
-                                )}
-                              </button>
-                              <p className="mt-6 text-[9px] text-[#f7edf4]/30 text-center uppercase tracking-widest font-mono">Estimated Risk Reduction: -{selectedRisk.reduction_score || 8} Points</p>
-                            </div>
-                          ) : (
-                            <div className="p-10 bg-[#4CAF50]/10 border border-[#4CAF50]/20 rounded-[40px] text-center">
-                              <ShieldCheck size={48} className="text-[#4CAF50] mx-auto mb-6" />
-                              <h4 className="text-xl font-black text-[#4CAF50] uppercase tracking-[0.2em] mb-4">Integrity Verified</h4>
-                              <p className="text-[#f7edf4]/60 text-[10px] font-mono leading-relaxed uppercase tracking-wider">The suggested mitigation has been applied to the neural simulation. The newly calculated risk score reflects the enhanced security posture.</p>
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Bottom Spacer */}
-
-                <div className="mt-32 flex justify-center pb-20">
-                  <button onClick={() => setView('hub')} className="px-20 py-8 border border-[#c88cae]/40 rounded-full text-[12px] font-black tracking-[0.5em] uppercase hover:bg-[#c88cae] hover:text-[#080812] transition-all transform hover:-translate-y-2 shadow-2xl">Return to Hub</button>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          <ResultDashboard
+            results={results}
+            setView={setView}
+            applyMitigation={applyMitigation}
+            isApplying={isApplying}
+          />
         )}
-
       </AnimatePresence>
 
       {/* 6. NEURAL INTELLIGENCE CHAT */}
-      {view === 'result' && (
-        <div className="fixed bottom-10 right-80 z-[200] flex flex-col items-end gap-4">
-          <AnimatePresence>
-            {isChatOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className="w-96 h-[500px] bg-[#13182a]/95 backdrop-blur-3xl border border-[#c88cae]/30 rounded-[40px] shadow-2xl flex flex-col overflow-hidden"
-              >
-                <div className="p-6 border-b border-[#c88cae]/10 bg-[#c88cae]/5 flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#c88cae] animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c88cae]">Neural Intelligence</span>
+      {
+        view === 'result' && (
+          <div className="fixed bottom-10 right-80 z-[200] flex flex-col items-end gap-4">
+            <AnimatePresence>
+              {isChatOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                  className="w-96 h-[500px] bg-[#13182a]/95 backdrop-blur-3xl border border-[#c88cae]/30 rounded-[40px] shadow-2xl flex flex-col overflow-hidden"
+                >
+                  <div className="p-6 border-b border-[#c88cae]/10 bg-[#c88cae]/5 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-[#c88cae] animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c88cae]">Neural Intelligence</span>
+                    </div>
+                    <button onClick={() => setIsChatOpen(false)} className="text-[#f7edf4]/40 hover:text-[#c88cae] transition-colors"><X size={16} /></button>
                   </div>
-                  <button onClick={() => setIsChatOpen(false)} className="text-[#f7edf4]/40 hover:text-[#c88cae] transition-colors"><X size={16} /></button>
-                </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                  {chatHistory.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-40">
-                      <Cpu size={32} className="mb-4 text-[#c88cae]" />
-                      <p className="text-[10px] font-mono leading-relaxed uppercase tracking-wider">Analysis context loaded. Ask me about vulnerabilities, threat vectors, or ISO 21434 compliance.</p>
-                    </div>
-                  )}
-                  {chatHistory.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[85%] p-4 rounded-3xl text-[11px] leading-relaxed ${msg.role === 'user' ? 'bg-[#c88cae] text-[#080812] font-bold' : 'bg-[#080812]/60 border border-[#c88cae]/20 text-[#f7edf4]/80'}`}>
-                        {msg.content}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                    {chatHistory.length === 0 && (
+                      <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-40">
+                        <Cpu size={32} className="mb-4 text-[#c88cae]" />
+                        <p className="text-[10px] font-mono leading-relaxed uppercase tracking-wider">Analysis context loaded. Ask me about vulnerabilities, threat vectors, or ISO 21434 compliance.</p>
                       </div>
-                    </div>
-                  ))}
-                  {isChatLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-[#080812]/60 border border-[#c88cae]/20 p-4 rounded-3xl">
-                        <div className="flex gap-1">
-                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce" />
-                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.2s]" />
-                          <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.4s]" />
+                    )}
+                    {chatHistory.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] p-4 rounded-3xl text-[11px] leading-relaxed ${msg.role === 'user' ? 'bg-[#c88cae] text-[#080812] font-bold' : 'bg-[#080812]/60 border border-[#c88cae]/20 text-[#f7edf4]/80'}`}>
+                          {msg.content}
                         </div>
                       </div>
-                    </div>
-                  )}
-                  <div ref={chatEndRef} />
-                </div>
-
-                <div className="p-6 border-t border-[#c88cae]/10 bg-[#080812]/40 backdrop-blur-md">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleChat()}
-                      placeholder="Query the lattice..."
-                      className="w-full bg-[#13182a] border border-[#c88cae]/20 rounded-full py-4 pl-6 pr-14 text-[11px] font-mono text-[#f7edf4] outline-none focus:border-[#c88cae]/60 transition-all placeholder-[#c88cae]/20"
-                    />
-                    <button
-                      onClick={handleChat}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#c88cae] rounded-full flex items-center justify-center text-[#080812] hover:scale-105 active:scale-95 transition-all shadow-xl"
-                    >
-                      <ChevronRight size={18} />
-                    </button>
+                    ))}
+                    {isChatLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-[#080812]/60 border border-[#c88cae]/20 p-4 rounded-3xl">
+                          <div className="flex gap-1">
+                            <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce" />
+                            <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.2s]" />
+                            <div className="w-1 h-1 bg-[#c88cae] rounded-full animate-bounce [animation-delay:0.4s]" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsChatOpen(!isChatOpen)}
-            className={`w-16 h-16 rounded-[24px] flex items-center justify-center shadow-2xl transition-all duration-500 border-2 ${isChatOpen ? 'bg-[#c88cae] border-white/20 rotate-90' : 'bg-[#13182a]/95 border-[#c88cae]/20'}`}
-          >
-            {isChatOpen ? <X size={24} className="text-[#080812]" /> : <Cpu size={24} className="text-[#c88cae]" />}
-          </motion.button>
-        </div>
-      )}
+                  <div className="p-6 border-t border-[#c88cae]/10 bg-[#080812]/40 backdrop-blur-md">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleChat()}
+                        placeholder="Query the lattice..."
+                        className="w-full bg-[#13182a] border border-[#c88cae]/20 rounded-full py-4 pl-6 pr-14 text-[11px] font-mono text-[#f7edf4] outline-none focus:border-[#c88cae]/60 transition-all placeholder-[#c88cae]/20"
+                      />
+                      <button
+                        onClick={handleChat}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#c88cae] rounded-full flex items-center justify-center text-[#080812] hover:scale-105 active:scale-95 transition-all shadow-xl"
+                      >
+                        <ChevronRight size={18} />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsChatOpen(!isChatOpen)}
+              className={`w-16 h-16 rounded-[24px] flex items-center justify-center shadow-2xl transition-all duration-500 border-2 ${isChatOpen ? 'bg-[#c88cae] border-white/20 rotate-90' : 'bg-[#13182a]/95 border-[#c88cae]/20'}`}
+            >
+              {isChatOpen ? <X size={24} className="text-[#080812]" /> : <Cpu size={24} className="text-[#c88cae]" />}
+            </motion.button>
+          </div>
+        )
+      }
 
       {/* Global Aesthetics */}
       <div className="fixed top-[-30vh] right-[-10vw] w-[90vw] h-[90vh] bg-[#4b2741]/[0.05] rounded-full blur-[200px] pointer-events-none z-0" />
@@ -1001,7 +749,7 @@ const App = () => {
         </div>
       </div>
 
-    </div>
+    </div >
   );
 };
 
