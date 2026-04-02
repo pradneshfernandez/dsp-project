@@ -14,8 +14,15 @@ load_dotenv()
 from src.pipeline.orchestrator import run_parallel_orchestrator
 from src.pipeline.models import init_db, get_db, AnalysisResult
 
-# Initialize DB
-init_db()
+# Initialize DB in startup event
+@app.on_event("startup")
+async def startup_event():
+    try:
+        logger.info("🔗 Initializing Neural Database...")
+        init_db()
+        logger.info("✅ Database Ready.")
+    except Exception as e:
+        logger.error(f"❌ Database Initialization Failed: {str(e)}")
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
