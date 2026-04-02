@@ -173,6 +173,7 @@ const App = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const feedRef = useRef(null);
   const chatEndRef = useRef(null);
 
@@ -480,11 +481,9 @@ const App = () => {
                   Next-Gen ISO 21434 Neural Engineering
                 </motion.p>
                 <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-                  <NoiseBackground containerClassName="p-1 rounded-full inline-block" gradientColors={["#4b2741", "#c88cae", "#4b2741"]}>
-                    <button onClick={() => setView('hub')} className="px-20 py-8 bg-[#080812] rounded-full text-[#f7edf4] font-black tracking-[0.3em] uppercase hover:scale-105 active:scale-95 transition-all group">
-                      Initialize Pipeline <span className="group-hover:translate-x-2 inline-block transition-transform">&rarr;</span>
-                    </button>
-                  </NoiseBackground>
+                  <button onClick={() => setView('hub')} className="px-20 py-8 bg-[#080812] border border-[#c88cae]/60 hover:border-transparent rounded-full text-[#f7edf4] font-black tracking-[0.3em] uppercase hover:bg-[#c88cae]/10 hover:scale-105 active:scale-95 transition-all outline-none focus:outline-none group shadow-[0_0_20px_rgba(200,140,174,0.1)]">
+                    Get Started <span className="group-hover:translate-x-2 inline-block transition-transform">&rarr;</span>
+                  </button>
                 </motion.div>
               </div>
             </WavyBackground>
@@ -495,17 +494,44 @@ const App = () => {
         {view === 'hub' && (
           <motion.div key="hub" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="h-screen w-full flex flex-col items-center justify-center p-20 relative z-10">
             <h2 className="text-4xl font-black tracking-tighter mb-20 uppercase">Command Center</h2>
-            <div className="grid grid-cols-2 gap-10 w-full max-w-5xl">
-              <div onClick={() => { fetchHistory(); setShowHistory(true); }} className="group relative bg-[#13182a] border border-[#c88cae]/10 rounded-[40px] p-12 cursor-pointer hover:border-[#c88cae]/60 transition-all overflow-hidden h-[400px] flex flex-col justify-end">
-                <div className="absolute top-10 right-10 text-[#c88cae]/20 group-hover:text-[#c88cae]/40 transition-colors"><History size={80} strokeWidth={1} /></div>
-                <h3 className="text-3xl font-black mb-4">Neural Archives</h3>
-                <p className="text-[#f7edf4]/40 font-mono text-xs uppercase tracking-widest leading-relaxed">Access previously generated automotive threat landscapes and audit trails.</p>
+            <div className="grid grid-cols-2 gap-8 w-full max-w-5xl">
+
+              {/* Audit Logs Card */}
+              <div
+                onClick={() => { fetchHistory(); setShowHistory(true); }}
+                className="group relative bg-[#080812] border border-[#c88cae]/20 rounded-3xl p-10 cursor-pointer hover:border-[#c88cae]/60 transition-all shadow-xl hover:shadow-[0_0_40px_rgba(200,140,174,0.15)] flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c88cae]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div>
+                  <div className="w-14 h-14 bg-[#13182a] border border-[#c88cae]/30 rounded-2xl flex items-center justify-center mb-8 text-[#c88cae] group-hover:bg-[#c88cae] group-hover:text-[#080812] transition-colors duration-300">
+                    <History size={24} />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-4 tracking-wide">Threat Intelligence Audit Logs</h3>
+                  <p className="text-[#f7edf4]/60 text-sm leading-relaxed mb-10 font-sans">Access historical automotive hazard and risk modeling documentation, review past mitigation implementations, and trace system integrity audits.</p>
+                </div>
+                <div className="flex items-center text-[#c88cae] text-[10px] font-black uppercase tracking-[0.2em]">
+                  Open Archive <ChevronRight size={14} className="ml-2 group-hover:translate-x-2 transition-transform" />
+                </div>
               </div>
-              <div onClick={() => setView('designer')} className="group relative bg-[#13182a] border border-[#c88cae]/10 rounded-[40px] p-12 cursor-pointer hover:border-[#c88cae]/60 transition-all overflow-hidden h-[400px] flex flex-col justify-end">
-                <div className="absolute top-10 right-10 text-[#c88cae]/20 group-hover:text-[#c88cae]/40 transition-colors"><Zap size={80} strokeWidth={1} /></div>
-                <h3 className="text-3xl font-black mb-4">Quantum Analysis</h3>
-                <p className="text-[#f7edf4]/40 font-mono text-xs uppercase tracking-widest leading-relaxed">Initiate a fresh ISO 21434 analysis using the multi-agent visual architect.</p>
+
+              {/* Initiate Assessment Card */}
+              <div
+                onClick={() => setView('designer')}
+                className="group relative bg-[#080812] border border-[#c88cae]/20 rounded-3xl p-10 cursor-pointer hover:border-[#c88cae]/60 transition-all shadow-xl hover:shadow-[0_0_40px_rgba(200,140,174,0.15)] flex flex-col justify-between overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#c88cae]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div>
+                  <div className="w-14 h-14 bg-[#13182a] border border-[#c88cae]/30 rounded-2xl flex items-center justify-center mb-8 text-[#c88cae] group-hover:bg-[#c88cae] group-hover:text-[#080812] transition-colors duration-300">
+                    <Target size={24} />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-4 tracking-wide">Initiate Target Assessment</h3>
+                  <p className="text-[#f7edf4]/60 text-sm leading-relaxed mb-10 font-sans">Deploy a fresh ISO 21434 threat modeling pipeline utilizing the multi-agent orchestration architecture to assess live asset vulnerabilities.</p>
+                </div>
+                <div className="flex items-center text-[#c88cae] text-[10px] font-black uppercase tracking-[0.2em]">
+                  Configure Run <ChevronRight size={14} className="ml-2 group-hover:translate-x-2 transition-transform" />
+                </div>
               </div>
+
             </div>
             <button onClick={() => setView('landing')} className="mt-20 text-[10px] font-mono uppercase tracking-[0.4em] text-[#c88cae]/40 hover:text-[#c88cae] transition-colors">&larr; Back to Terminus</button>
           </motion.div>
