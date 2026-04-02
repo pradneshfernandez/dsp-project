@@ -55,69 +55,72 @@ class ErrorBoundary extends React.Component {
 
 const API_BASE = '/api';
 
+const NODE_STYLE = { border: '1px solid rgba(200, 140, 174, 0.3)', borderRadius: '12px', padding: '16px 20px', background: '#080812', color: '#f7edf4', fontWeight: 'bold', boxShadow: '0 10px 30px rgba(0,0,0,0.6)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em' };
+const EDGE_STYLE = { stroke: '#c88cae', strokeWidth: 1.5, opacity: 0.4 };
+
 const PRESETS = {
   adas: {
     name: 'ADAS Sensor Fusion',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'Front Camera' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Fusion ECU' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Brake Controller' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'Front Camera' }, type: 'input', style: NODE_STYLE },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Fusion ECU' }, style: NODE_STYLE },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Brake Controller' }, type: 'output', style: NODE_STYLE },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#50ffab' } },
-      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
+      { id: 'e1-2', source: '1', target: '2', animated: true, style: EDGE_STYLE },
+      { id: 'e2-3', source: '2', target: '3', style: EDGE_STYLE },
     ]
   },
   ev: {
     name: 'EV Powertrain',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'BMS' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Inverter' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Traction Motor' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'BMS' }, type: 'input', style: NODE_STYLE },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Inverter' }, style: NODE_STYLE },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Traction Motor' }, type: 'output', style: NODE_STYLE },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', style: { stroke: '#50ffab' } },
-      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
+      { id: 'e1-2', source: '1', target: '2', style: EDGE_STYLE },
+      { id: 'e2-3', source: '2', target: '3', style: EDGE_STYLE },
     ]
   },
   infotainment: {
     name: 'Infotainment Hub',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'TCU (5G)' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'IVI SoC' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '3', position: { x: 550, y: 50 }, data: { label: 'Digital Cluster' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '4', position: { x: 550, y: 250 }, data: { label: 'Rear-Seat ENT' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'TCU (5G)' }, type: 'input', style: NODE_STYLE },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'IVI SoC' }, style: NODE_STYLE },
+      { id: '3', position: { x: 550, y: 50 }, data: { label: 'Digital Cluster' }, type: 'output', style: NODE_STYLE },
+      { id: '4', position: { x: 550, y: 250 }, data: { label: 'Rear-Seat ENT' }, type: 'output', style: NODE_STYLE },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#50ffab' } },
-      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
-      { id: 'e2-4', source: '2', target: '4', style: { stroke: '#50ffab' } },
+      { id: 'e1-2', source: '1', target: '2', animated: true, style: EDGE_STYLE },
+      { id: 'e2-3', source: '2', target: '3', style: EDGE_STYLE },
+      { id: 'e2-4', source: '2', target: '4', style: EDGE_STYLE },
     ]
   },
   gateway: {
     name: 'Security Gateway',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'OBD-II' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Central Gateway' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Powertrain CAN' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'OBD-II' }, type: 'input', style: NODE_STYLE },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Central Gateway' }, style: NODE_STYLE },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Powertrain CAN' }, type: 'output', style: NODE_STYLE },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', style: { stroke: '#50ffab' } },
-      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
+      { id: 'e1-2', source: '1', target: '2', style: EDGE_STYLE },
+      { id: 'e2-3', source: '2', target: '3', style: EDGE_STYLE },
     ]
   },
   autolevel3: {
     name: 'L3 Autonomous',
     nodes: [
-      { id: '1', position: { x: 50, y: 50 }, data: { label: 'LIDAR' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '2', position: { x: 50, y: 250 }, data: { label: 'RADAR' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '3', position: { x: 300, y: 150 }, data: { label: 'Drive Pilot ECU' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
-      { id: '4', position: { x: 550, y: 150 }, data: { label: 'Steering Rack' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '1', position: { x: 50, y: 50 }, data: { label: 'LIDAR' }, type: 'input', style: NODE_STYLE },
+      { id: '2', position: { x: 50, y: 250 }, data: { label: 'RADAR' }, type: 'input', style: NODE_STYLE },
+      { id: '3', position: { x: 300, y: 150 }, data: { label: 'Drive Pilot ECU' }, style: NODE_STYLE },
+      { id: '4', position: { x: 550, y: 150 }, data: { label: 'Steering Rack' }, type: 'output', style: NODE_STYLE },
     ],
     edges: [
-      { id: 'e1-3', source: '1', target: '3', animated: true, style: { stroke: '#50ffab' } },
-      { id: 'e2-3', source: '2', target: '3', animated: true, style: { stroke: '#50ffab' } },
-      { id: 'e3-4', source: '3', target: '4', style: { stroke: '#50ffab' } },
+      { id: 'e1-3', source: '1', target: '3', animated: true, style: EDGE_STYLE },
+      { id: 'e2-3', source: '2', target: '3', animated: true, style: EDGE_STYLE },
+      { id: 'e3-4', source: '3', target: '4', style: EDGE_STYLE },
     ]
   }
 };
@@ -550,7 +553,7 @@ const App = () => {
 
             <div className="flex-1 flex overflow-hidden">
               {/* COMPREHENSIVE SIDEBAR */}
-              <div className="w-80 bg-[#13182a] border-r border-[#c88cae]/10 py-8 px-6 flex flex-col gap-8 overflow-y-auto custom-scrollbar shadow-2xl">
+              <div className="w-80 bg-[#080812] border-r border-[#c88cae]/10 py-8 px-6 flex flex-col gap-8 overflow-y-auto custom-scrollbar shadow-[20px_0_40px_rgba(0,0,0,0.5)] z-10">
 
                 {/* 1. ARCHITECTURE PRESETS */}
                 <div>
@@ -560,7 +563,7 @@ const App = () => {
                       <button
                         key={key}
                         onClick={() => loadPreset(key)}
-                        className="w-full text-left p-4 bg-[#080812]/40 border border-[#c88cae]/5 rounded-2xl hover:border-[#c88cae]/40 transition-all group"
+                        className="w-full text-left p-4 bg-[#13182a]/50 border border-transparent border-l-2 border-l-[#13182a] hover:border-l-[#c88cae] hover:bg-[#c88cae]/5 rounded-r-xl transition-all group"
                       >
                         <p className="text-[10px] font-bold text-[#f7edf4] group-hover:text-[#c88cae] tracking-tight transition-colors">{p.name}</p>
                         <div className="flex gap-2 mt-1 opacity-20 group-hover:opacity-100 transition-opacity">
@@ -586,7 +589,7 @@ const App = () => {
                       <button
                         key={item.type}
                         onClick={() => addNode(item.type)}
-                        className="flex flex-col items-center justify-center p-4 bg-[#080812]/80 border border-[#c88cae]/10 rounded-2xl hover:bg-[#c88cae]/10 hover:border-[#c88cae]/40 transition-all group"
+                        className="flex flex-col items-center justify-center py-5 bg-[#13182a]/50 border border-[#c88cae]/5 rounded-2xl hover:bg-[#c88cae]/10 hover:border-[#c88cae]/30 hover:-translate-y-1 transition-all group shadow-sm"
                       >
                         <span className="text-[#c88cae]/40 group-hover:text-[#c88cae] mb-2">{item.icon}</span>
                         <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
@@ -603,7 +606,7 @@ const App = () => {
                       <button
                         key={key}
                         onClick={() => loadRubric(key)}
-                        className="w-full text-left p-4 bg-[#080812]/40 border border-[#c88cae]/5 rounded-2xl hover:border-[#c88cae]/40 transition-all group"
+                        className="w-full text-left p-4 bg-[#13182a]/50 border border-transparent border-l-2 border-l-[#13182a] hover:border-l-[#c88cae] hover:bg-[#c88cae]/5 rounded-r-xl transition-all group"
                       >
                         <p className="text-[10px] font-bold text-[#f7edf4] group-hover:text-[#c88cae] tracking-tight">{r.name}</p>
                       </button>
@@ -624,18 +627,18 @@ const App = () => {
                     onConnect={onConnect}
                     onNodeDoubleClick={onNodeDoubleClick}
                     fitView
-                    style={{ backgroundColor: '#000' }}
+                    style={{ backgroundColor: '#030308' }}
                   >
-                    <Background color="#ffffff" gap={40} size={1} opacity={0.3} variant="dots" />
+                    <Background color="#c88cae" gap={40} size={1} opacity={0.1} variant="dots" />
                     <Controls className="!bg-[#ffffff] !border-[#000000] !fill-[#000000]" />
-                    <Panel position="top-right" className="bg-[#ffffff]/10 p-4 rounded-xl border border-[#ffffff]/20 text-[9px] font-mono text-[#ffffff] uppercase tracking-widest backdrop-blur-md">
+                    <Panel position="top-right" className="bg-[#13182a]/50 p-4 rounded-xl border border-[#c88cae]/20 text-[9px] font-mono text-[#c88cae] uppercase tracking-widest backdrop-blur-md shadow-xl">
                       Interactive Simulation Canvas &bull; Monochrome Edition
                     </Panel>
                   </ReactFlow>
                 </div>
 
                 {/* Rubric Quick Config */}
-                <div className="h-48 bg-[#13182a] border-t border-[#c88cae]/10 p-6 flex flex-col overflow-hidden">
+                <div className="h-48 bg-[#080812] border-t border-[#c88cae]/10 p-6 flex flex-col overflow-hidden z-10 shadow-[0_-20px_40px_rgba(0,0,0,0.5)]">
                   <div className="flex justify-between items-center mb-4">
                     <p className="text-[9px] font-mono uppercase tracking-widest text-[#c88cae]">Risk Rubric Parameters</p>
                     <Zap size={12} className="text-[#c88cae]/40" />
@@ -643,7 +646,7 @@ const App = () => {
                   <textarea
                     value={rubricText}
                     onChange={(e) => setRubricText(e.target.value)}
-                    className="flex-1 bg-[#080812] border border-[#c88cae]/10 rounded-xl p-4 text-[10px] font-mono text-[#f7edf4]/60 outline-none focus:border-[#c88cae]/40 transition-all resize-none custom-scrollbar"
+                    className="flex-1 bg-[#13182a]/50 border border-[#c88cae]/5 rounded-xl p-4 text-[10px] font-mono text-[#c88cae] outline-none focus:border-[#c88cae]/40 transition-all resize-none custom-scrollbar shadow-inner block"
                   />
                 </div>
               </div>
