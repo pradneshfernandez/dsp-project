@@ -14,6 +14,102 @@ import { Cover } from './components/ui/cover';
 
 const API_BASE = '/api';
 
+const PRESETS = {
+  adas: {
+    name: 'ADAS Sensor Fusion',
+    nodes: [
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'Front Camera' }, type: 'input' },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Fusion ECU' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Brake Controller' }, type: 'output' },
+    ],
+    edges: [
+      { id: 'e1-2', source: '1', target: '2', animated: true },
+      { id: 'e2-3', source: '2', target: '3' },
+    ]
+  },
+  ev: {
+    name: 'EV Powertrain',
+    nodes: [
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'BMS' }, type: 'input' },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Inverter' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Traction Motor' }, type: 'output' },
+    ],
+    edges: [
+      { id: 'e1-2', source: '1', target: '2' },
+      { id: 'e2-3', source: '2', target: '3' },
+    ]
+  },
+  infotainment: {
+    name: 'Infotainment Hub',
+    nodes: [
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'TCU (5G)' }, type: 'input' },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'IVI SoC' } },
+      { id: '3', position: { x: 550, y: 50 }, data: { label: 'Digital Cluster' }, type: 'output' },
+      { id: '4', position: { x: 550, y: 250 }, data: { label: 'Rear-Seat ENT' }, type: 'output' },
+    ],
+    edges: [
+      { id: 'e1-2', source: '1', target: '2', animated: true },
+      { id: 'e2-3', source: '2', target: '3' },
+      { id: 'e2-4', source: '2', target: '4' },
+    ]
+  },
+  gateway: {
+    name: 'Security Gateway',
+    nodes: [
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'OBD-II' }, type: 'input' },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Central Gateway' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Powertrain CAN' }, type: 'output' },
+    ],
+    edges: [
+      { id: 'e1-2', source: '1', target: '2' },
+      { id: 'e2-3', source: '2', target: '3' },
+    ]
+  },
+  autolevel3: {
+    name: 'L3 Autonomous',
+    nodes: [
+      { id: '1', position: { x: 50, y: 50 }, data: { label: 'LIDAR' }, type: 'input' },
+      { id: '2', position: { x: 50, y: 250 }, data: { label: 'RADAR' }, type: 'input' },
+      { id: '3', position: { x: 300, y: 150 }, data: { label: 'Drive Pilot ECU' } },
+      { id: '4', position: { x: 550, y: 150 }, data: { label: 'Steering Rack' }, type: 'output' },
+    ],
+    edges: [
+      { id: 'e1-3', source: '1', target: '3', animated: true },
+      { id: 'e2-3', source: '2', target: '3', animated: true },
+      { id: 'e3-4', source: '3', target: '4' },
+    ]
+  }
+};
+
+const RUBRIC_PRESETS = {
+  iso: {
+    name: 'ISO 21434 Standard',
+    content: `## ISO 21434 Risk Rubric
+- **Impact**: Safety, Operational, Financial, Privacy
+- **Feasibility**: High, Medium, Low, Very Low
+- **Calculation**: Impact x Feasibility (Score 1-20)`
+  },
+  heavens: {
+    name: 'HEAVENS Tier 1',
+    content: `## HEAVENS Security Model
+- **Impact**: Critical, Major, Moderate, Minor
+- **Threat Level**: High, Medium, Low
+- **Calculation**: Security Level (Impact x Threat)`
+  },
+  stride: {
+    name: 'STRIDE Mapping',
+    content: `## STRIDE/CWE Assessment
+- **Categories**: Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege
+- **Priority**: Based on CWE severity scores.`
+  },
+  custom: {
+    name: 'Custom Research',
+    content: `## Technical Vulnerability Analysis
+- **Focus**: Zero-day trends (2025-2026)
+- **Metric**: CVSS v4 equivalent base scoring.`
+  }
+};
+
 const App = () => {
   const [view, setView] = useState('landing'); // landing | hub | designer | processing | result
   const [ragFeed, setRagFeed] = useState([]);
@@ -139,6 +235,21 @@ const App = () => {
       style: { background: '#13182a', color: '#f7edf4', border: '1px solid #c88cae44', borderRadius: '12px', fontSize: '10px', padding: '10px', fontWeight: 'bold' }
     };
     setNodes((nds) => nds.concat(newNode));
+  };
+
+  const loadPreset = (key) => {
+    const preset = PRESETS[key];
+    if (preset) {
+      setNodes(preset.nodes);
+      setEdges(preset.edges);
+    }
+  };
+
+  const loadRubric = (key) => {
+    const preset = RUBRIC_PRESETS[key];
+    if (preset) {
+      setRubricText(preset.content);
+    }
   };
 
   const applyMitigation = async (risk) => {
@@ -272,20 +383,68 @@ const App = () => {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-              {/* Toolbox */}
-              <div className="w-64 bg-[#13182a] border-r border-[#c88cae]/10 p-6 flex flex-col gap-4">
-                <p className="text-[9px] font-mono uppercase tracking-widest text-[#c88cae] mb-4">Neural Assets</p>
-                {[
-                  { type: 'ecu', icon: <Cpu size={14} />, label: 'Electronic Control Unit' },
-                  { type: 'gateway', icon: <Layers size={14} />, label: 'Security Gateway' },
-                  { type: 'sensor', icon: <Zap size={14} />, label: 'Sensor Cluster' },
-                  { type: 'actuator', icon: <Activity size={14} />, label: 'Braking Actuator' }
-                ].map(item => (
-                  <button key={item.type} onClick={() => addNode(item.type)} className="flex items-center gap-4 p-4 bg-[#080812] border border-[#c88cae]/10 rounded-2xl hover:border-[#c88cae] transition-all text-left group">
-                    <span className="text-[#c88cae]/40 group-hover:text-[#c88cae]">{item.icon}</span>
-                    <span className="text-[10px] font-bold uppercase tracking-tight">{item.label}</span>
-                  </button>
-                ))}
+              {/* COMPREHENSIVE SIDEBAR */}
+              <div className="w-80 bg-[#13182a] border-r border-[#c88cae]/10 py-8 px-6 flex flex-col gap-8 overflow-y-auto custom-scrollbar shadow-2xl">
+
+                {/* 1. ARCHITECTURE PRESETS */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#c88cae] mb-6 flex items-center gap-2"><Layers size={14} /> Design Presets</p>
+                  <div className="space-y-3">
+                    {Object.entries(PRESETS).map(([key, p]) => (
+                      <button
+                        key={key}
+                        onClick={() => loadPreset(key)}
+                        className="w-full text-left p-4 bg-[#080812]/40 border border-[#c88cae]/5 rounded-2xl hover:border-[#c88cae]/40 transition-all group"
+                      >
+                        <p className="text-[10px] font-bold text-[#f7edf4] group-hover:text-[#c88cae] tracking-tight transition-colors">{p.name}</p>
+                        <div className="flex gap-2 mt-1 opacity-20 group-hover:opacity-100 transition-opacity">
+                          <span className="text-[8px] uppercase font-mono">{p.nodes.length} Nodes</span>
+                          <span className="text-[8px] uppercase font-mono">&bull;</span>
+                          <span className="text-[8px] uppercase font-mono">{p.edges.length} Edges</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. NEURAL ASSETS (DRAG/ADD) */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#c88cae] mb-6 flex items-center gap-2"><Cpu size={14} /> Add Components</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { icon: <Cpu size={14} />, label: 'ECU', type: 'ecu' },
+                      { icon: <ShieldCheck size={14} />, label: 'GW', type: 'gateway' },
+                      { icon: <Activity size={14} />, label: 'ACT', type: 'actuator' },
+                      { icon: <Zap size={14} />, label: 'SEN', type: 'sensor' }
+                    ].map(item => (
+                      <button
+                        key={item.type}
+                        onClick={() => addNode(item.type)}
+                        className="flex flex-col items-center justify-center p-4 bg-[#080812]/80 border border-[#c88cae]/10 rounded-2xl hover:bg-[#c88cae]/10 hover:border-[#c88cae]/40 transition-all group"
+                      >
+                        <span className="text-[#c88cae]/40 group-hover:text-[#c88cae] mb-2">{item.icon}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. RUBRIC PRESETS */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#c88cae] mb-6 flex items-center gap-2"><Zap size={14} /> Risk Rubrics</p>
+                  <div className="space-y-3">
+                    {Object.entries(RUBRIC_PRESETS).map(([key, r]) => (
+                      <button
+                        key={key}
+                        onClick={() => loadRubric(key)}
+                        className="w-full text-left p-4 bg-[#080812]/40 border border-[#c88cae]/5 rounded-2xl hover:border-[#c88cae]/40 transition-all group"
+                      >
+                        <p className="text-[10px] font-bold text-[#f7edf4] group-hover:text-[#c88cae] tracking-tight">{r.name}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
               {/* Canvas */}
