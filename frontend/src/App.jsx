@@ -172,7 +172,10 @@ const App = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState(null);
+  const feedRef = useRef(null);
+  const chatEndRef = useRef(null);
 
   // Compute aggregated dynamic chart data from `results.tara`
   const getAssetDistribution = () => {
