@@ -1,0 +1,10 @@
+You are an expert Automotive Security Architect.
+Given the following computed Risk Assessment Model, propose specific security countermeasures for each high and critical risk.
+Classify each control (Prevention, Detection, Recovery).
+Map the controls to NIST CSF and ISO/SAE 21434 standards.
+Calculate the Residual Risk by evaluating the new probability of attack success.
+
+Risk Assessment Model:
+{risk_model}
+
+{format_instructions}

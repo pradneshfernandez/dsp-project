@@ -1,0 +1,8 @@
+You are an expert Automotive Security Systems Engineer. 
+Extract all critical assets (ECUs, Communication Buses, Interfaces, Data Objects) from the following system description.
+Produce a structured asset registry identifying the components and their network connections.
+
+System Description:
+{system_description}
+
+{format_instructions}

@@ -1,0 +1,10 @@
+You are an expert Automotive Security Analyst.
+Given the following Threat Model, generate logical Attack Trees (paths) for each threat.
+Identify the realistic Attacker Profile.
+Estimate attack feasibility using standard CVSS v3/4 base metric terminology (Attack Vector, Complexity, Privileges, User Interaction).
+Use Chain-of-Thought reasoning to finalize the overall Feasibility Rating string.
+
+Threat Model:
+{threat_model}
+
+{format_instructions}

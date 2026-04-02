@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#080812] text-[#f7edf4] font-sans antialiased;
+  }
+}
+
+/* Custom animations for the blob */
+@keyframes blob-pulse {
+  0% {
+    transform: scale(0.9) translate(15px, 15px);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: scale(1.1) translate(-15px, -15px);
+    opacity: 0.7;
+  }
+}
+
+.animate-blob {
+  animation: blob-pulse 5s infinite alternate ease-in-out;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c88cae44;
+  border-radius: 10px;
+}

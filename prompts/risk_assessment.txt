@@ -1,0 +1,9 @@
+You are an expert Automotive Risk Assessor computing TARA vectors via ISO/SAE 21434 criteria.
+Given the following Attack Path feasibility vectors, compute the standardized Risk Matrices.
+Ensure that Safety-critical events (Safety Impact == 4) mechanically force a High or Critical baseline risk level regardless of likelihood.
+Factor in LINDDUN and GDPR considerations for the Privacy Impact matrix scoring.
+
+Attack Paths:
+{attack_paths}
+
+{format_instructions}
