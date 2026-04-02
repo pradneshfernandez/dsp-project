@@ -11,6 +11,74 @@ import { NoiseBackground } from './components/ui/noise-background';
 import { WavyBackground } from './components/ui/wavy-background';
 import { LoaderOne } from './components/ui/loader';
 import { Cover } from './components/ui/cover';
+import { LayoutGrid } from './components/ui/layout-grid';
+
+const SkeletonOne = () => (
+  <div>
+    <p className="font-bold md:text-3xl text-xl text-white">Neural Hub Core</p>
+    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">TARA Analysis Center</p>
+    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
+      A centralized diagnostic and threat modeling terminal designed for ISO 21434 compliance.
+    </p>
+  </div>
+);
+
+const SkeletonTwo = () => (
+  <div>
+    <p className="font-bold md:text-3xl text-xl text-white">Visual Architecture</p>
+    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">System Topology</p>
+    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
+      Mapping connected ECUs, Gateways, and sensors to identify critical attack paths.
+    </p>
+  </div>
+);
+
+const SkeletonThree = () => (
+  <div>
+    <p className="font-bold md:text-3xl text-xl text-white">Quantum Sign-off</p>
+    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">Automated Audit</p>
+    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
+      The Chief Auditor verifies safety standards and mitigation parity.
+    </p>
+  </div>
+);
+
+const SkeletonFour = () => (
+  <div>
+    <p className="font-bold md:text-3xl text-xl text-white">Cyber Matrix</p>
+    <p className="font-normal text-xs text-white uppercase tracking-widest mt-2 opacity-50">Threat Landscape</p>
+    <p className="font-normal text-xs my-4 max-w-lg text-[#f7edf4]/70">
+      Detailed drill-down across identified attack vectors and CVE probabilities.
+    </p>
+  </div>
+);
+
+const uiCards = [
+  {
+    id: 1,
+    content: <SkeletonOne />,
+    className: "md:col-span-2",
+    thumbnail: "https://images.unsplash.com/photo-1476231682828-37e571bc172f?q=80&w=3474&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 2,
+    content: <SkeletonTwo />,
+    className: "col-span-1",
+    thumbnail: "https://images.unsplash.com/photo-1464457312035-3d7d0e0c058e?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 3,
+    content: <SkeletonThree />,
+    className: "col-span-1",
+    thumbnail: "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    id: 4,
+    content: <SkeletonFour />,
+    className: "md:col-span-2",
+    thumbnail: "https://images.unsplash.com/photo-1475070929565-c985b496cb9f?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+];
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -819,7 +887,14 @@ const App = () => {
                   </div>
                 </div>
 
-                <div className="mt-20 flex justify-center">
+                <div className="mt-20">
+                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-8 flex items-center gap-4"><Layers size={18} /> Visual Telemetry</h4>
+                  <div className="h-[600px] w-full rounded-[40px] overflow-hidden border border-[#c88cae]/10 bg-[#080812]/40 relative">
+                    <LayoutGrid cards={uiCards} />
+                  </div>
+                </div>
+
+                <div className="mt-20 flex justify-center pb-20">
                   <button onClick={() => setView('hub')} className="px-20 py-8 border border-[#c88cae]/40 rounded-full text-[12px] font-black tracking-[0.5em] uppercase hover:bg-[#c88cae] hover:text-[#080812] transition-all transform hover:-translate-y-2 shadow-2xl">Return to Hub</button>
                 </div>
               </div>
