@@ -12,6 +12,60 @@ import { WavyBackground } from './components/ui/wavy-background';
 import { LoaderOne } from './components/ui/loader';
 import { Cover } from './components/ui/cover';
 import { LayoutGrid } from './components/ui/layout-grid';
+import { HoverEffect } from './components/ui/card-hover-effect';
+
+export const cyberProjects = [
+  { title: "V2X Authentication", description: "Multi-layered cryptographic handshakes for vehicle-to-everything communication boundaries.", link: "#" },
+  { title: "CAN-FD Shield", description: "Deep packet inspection and anomaly detection on the primary controller area network.", link: "#" },
+  { title: "OTA Integrity", description: "Quantum-resistant firmware signing and rollback prevention architectures.", link: "#" },
+  { title: "Gateway Sandbox", description: "Iso-mapped execution environments for third-party infotainment payloads.", link: "#" },
+  { title: "ECU Zero-Trust", description: "Mutual TLS verification for intra-vehicle microservices and controller nodes.", link: "#" },
+  { title: "Lidar Spoofing Defense", description: "Sensor fusion redundancy and physical-layer entropy validation.", link: "#" },
+];
+
+function StaticBentoGrid() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full mt-10">
+      <div className="col-span-1 lg:col-span-2 h-full bg-[#c88cae]/10 border border-[#c88cae]/20 min-h-[500px] lg:min-h-[300px] rounded-3xl p-10 relative overflow-hidden group">
+        <div className="max-w-xs relative z-20">
+          <h2 className="text-left text-balance text-xl lg:text-3xl font-black uppercase tracking-widest text-[#f7edf4]">
+            AutoTARA shields the entire automotive software stack
+          </h2>
+          <p className="mt-4 text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
+            With over 1,000,000 simulated attack vectors neutralized, AutoTARA is the most robust compliance platform for modern OEMs.
+          </p>
+        </div>
+        <div className="absolute -right-4 lg:-right-[10%] -bottom-10 opacity-10 group-hover:opacity-30 transition-opacity duration-500">
+          <ShieldCheck size={350} />
+        </div>
+      </div>
+
+      <div className="col-span-1 min-h-[300px] bg-[#13182a] border border-[#c88cae]/20 rounded-3xl p-10 relative overflow-hidden flex flex-col justify-end group">
+        <h2 className="max-w-80 text-left text-balance text-xl lg:text-2xl font-black uppercase tracking-widest text-[#f7edf4]">
+          Zero Trust.<br />Zero Exceptions.<br />Zero Vulnerabilities.
+        </h2>
+        <p className="mt-4 text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
+          If a component falls out of compliance, the entire pathway is quarantined.
+        </p>
+      </div>
+
+      <div className="col-span-1 lg:col-span-3 bg-[#080812]/80 border border-[#c88cae]/20 min-h-[500px] lg:min-h-[300px] xl:min-h-[250px] rounded-3xl p-10 relative overflow-hidden group">
+        <div className="max-w-sm relative z-20">
+          <h2 className="max-w-sm md:max-w-lg text-left text-balance text-xl lg:text-2xl font-black uppercase tracking-widest text-[#f7edf4]">
+            Deploy quantum-resistant algorithmic checks today!
+          </h2>
+          <p className="mt-4 max-w-[26rem] text-left text-[10px] uppercase font-mono text-[#f7edf4]/60">
+            Automate ISO/SAE 21434 and UN R155 compliance with our ultra-fast Neural Engine. Stop zero-days before they compile.
+          </p>
+        </div>
+        <div className="absolute -right-10 md:-right-[10%] lg:right-[5%] top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-1000 flex gap-4">
+          <Database size={250} />
+          <Cpu size={250} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SkeletonOne = () => (
   <div>
@@ -894,7 +948,18 @@ const App = () => {
                   </div>
                 </div>
 
-                <div className="mt-20 flex justify-center pb-20">
+                <div className="mt-32">
+                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-4 flex items-center gap-4 text-center justify-center w-full"><ShieldCheck size={18} /> Threat Vector Analysis Deep-Dive</h4>
+                  <p className="text-center text-[10px] uppercase font-mono text-[#f7edf4]/40 mb-10 tracking-widest">Select an infrastructure anomaly to isolate the signal</p>
+                  <HoverEffect items={cyberProjects} />
+                </div>
+
+                <div className="mt-20">
+                  <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.4em] mb-4 flex items-center gap-4 text-center justify-center w-full"><Cpu size={18} /> Core Competency Directives</h4>
+                  <StaticBentoGrid />
+                </div>
+
+                <div className="mt-32 flex justify-center pb-20">
                   <button onClick={() => setView('hub')} className="px-20 py-8 border border-[#c88cae]/40 rounded-full text-[12px] font-black tracking-[0.5em] uppercase hover:bg-[#c88cae] hover:text-[#080812] transition-all transform hover:-translate-y-2 shadow-2xl">Return to Hub</button>
                 </div>
               </div>
