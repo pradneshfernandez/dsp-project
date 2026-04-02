@@ -1,12 +1,15 @@
 import asyncio
 import json
 import time
+import logging
 import re
 from langchain_core.prompts import PromptTemplate
 from src.utils.llm_client import get_llm
 from src.pipeline.models import SessionLocal, AnalysisResult
 from src.pipeline.supabase_client import save_analysis as save_to_supabase
 import os
+
+logger = logging.getLogger(__name__)
 
 async def run_asset_agent(sys_content):
     """Gemma 3 27B: Parses specs and lists HW/SW/Data assets."""
@@ -100,5 +103,6 @@ Return JSON ONLY. No markdown.
 
     except Exception as e:
         logger.error(f"Neural Orchestration Fatal Error: {str(e)}")
+        raise e
         # Raise it so server.py can send stage: "error"
         raise Exception(f"Neural Engine Failover: {str(e)}")
