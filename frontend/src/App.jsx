@@ -7,6 +7,9 @@ import '@xyflow/react/dist/style.css';
 
 import { EncryptedText } from './components/ui/encrypted-text';
 import { NoiseBackground } from './components/ui/noise-background';
+import { WavyBackground } from './components/ui/wavy-background';
+import { LoaderOne } from './components/ui/loader';
+import { Cover } from './components/ui/cover';
 import { PieChart, Pie, Cell, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend } from 'recharts';
 import ResultDashboard from './components/ResultDashboard';
 
