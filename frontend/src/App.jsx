@@ -18,65 +18,65 @@ const PRESETS = {
   adas: {
     name: 'ADAS Sensor Fusion',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'Front Camera' }, type: 'input' },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Fusion ECU' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Brake Controller' }, type: 'output' },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'Front Camera' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Fusion ECU' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Brake Controller' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', animated: true },
-      { id: 'e2-3', source: '2', target: '3' },
+      { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#50ffab' } },
+      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
     ]
   },
   ev: {
     name: 'EV Powertrain',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'BMS' }, type: 'input' },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Inverter' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Traction Motor' }, type: 'output' },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'BMS' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Inverter' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Traction Motor' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2' },
-      { id: 'e2-3', source: '2', target: '3' },
+      { id: 'e1-2', source: '1', target: '2', style: { stroke: '#50ffab' } },
+      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
     ]
   },
   infotainment: {
     name: 'Infotainment Hub',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'TCU (5G)' }, type: 'input' },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'IVI SoC' } },
-      { id: '3', position: { x: 550, y: 50 }, data: { label: 'Digital Cluster' }, type: 'output' },
-      { id: '4', position: { x: 550, y: 250 }, data: { label: 'Rear-Seat ENT' }, type: 'output' },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'TCU (5G)' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'IVI SoC' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '3', position: { x: 550, y: 50 }, data: { label: 'Digital Cluster' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '4', position: { x: 550, y: 250 }, data: { label: 'Rear-Seat ENT' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2', animated: true },
-      { id: 'e2-3', source: '2', target: '3' },
-      { id: 'e2-4', source: '2', target: '4' },
+      { id: 'e1-2', source: '1', target: '2', animated: true, style: { stroke: '#50ffab' } },
+      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
+      { id: 'e2-4', source: '2', target: '4', style: { stroke: '#50ffab' } },
     ]
   },
   gateway: {
     name: 'Security Gateway',
     nodes: [
-      { id: '1', position: { x: 50, y: 150 }, data: { label: 'OBD-II' }, type: 'input' },
-      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Central Gateway' } },
-      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Powertrain CAN' }, type: 'output' },
+      { id: '1', position: { x: 50, y: 150 }, data: { label: 'OBD-II' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '2', position: { x: 300, y: 150 }, data: { label: 'Central Gateway' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '3', position: { x: 550, y: 150 }, data: { label: 'Powertrain CAN' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
     ],
     edges: [
-      { id: 'e1-2', source: '1', target: '2' },
-      { id: 'e2-3', source: '2', target: '3' },
+      { id: 'e1-2', source: '1', target: '2', style: { stroke: '#50ffab' } },
+      { id: 'e2-3', source: '2', target: '3', style: { stroke: '#50ffab' } },
     ]
   },
   autolevel3: {
     name: 'L3 Autonomous',
     nodes: [
-      { id: '1', position: { x: 50, y: 50 }, data: { label: 'LIDAR' }, type: 'input' },
-      { id: '2', position: { x: 50, y: 250 }, data: { label: 'RADAR' }, type: 'input' },
-      { id: '3', position: { x: 300, y: 150 }, data: { label: 'Drive Pilot ECU' } },
-      { id: '4', position: { x: 550, y: 150 }, data: { label: 'Steering Rack' }, type: 'output' },
+      { id: '1', position: { x: 50, y: 50 }, data: { label: 'LIDAR' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '2', position: { x: 50, y: 250 }, data: { label: 'RADAR' }, type: 'input', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '3', position: { x: 300, y: 150 }, data: { label: 'Drive Pilot ECU' }, style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
+      { id: '4', position: { x: 550, y: 150 }, data: { label: 'Steering Rack' }, type: 'output', style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold' } },
     ],
     edges: [
-      { id: 'e1-3', source: '1', target: '3', animated: true },
-      { id: 'e2-3', source: '2', target: '3', animated: true },
-      { id: 'e3-4', source: '3', target: '4' },
+      { id: 'e1-3', source: '1', target: '3', animated: true, style: { stroke: '#50ffab' } },
+      { id: 'e2-3', source: '2', target: '3', animated: true, style: { stroke: '#50ffab' } },
+      { id: 'e3-4', source: '3', target: '4', style: { stroke: '#50ffab' } },
     ]
   }
 };
@@ -155,7 +155,11 @@ const App = () => {
     setRagFeed(prev => [...prev.slice(-15), msg]);
   };
 
-  const onConnect = (params) => setEdges((eds) => addEdge({ ...params, markerEnd: { type: MarkerType.ArrowClosed, color: '#c88cae' }, style: { stroke: '#c88cae' } }, eds));
+  const onConnect = (params) => setEdges((eds) => addEdge({
+    ...params,
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#50ffab' },
+    style: { stroke: '#50ffab', strokeWidth: 2 }
+  }, eds));
 
   // --- SERIALIZATION ---
   const serializeTopology = () => {
@@ -232,7 +236,7 @@ const App = () => {
       type,
       position: { x: Math.random() * 400, y: Math.random() * 400 },
       data: { label: `${type.toUpperCase()} ${nodes.length + 1}` },
-      style: { background: '#13182a', color: '#f7edf4', border: '1px solid #c88cae44', borderRadius: '12px', fontSize: '10px', padding: '10px', fontWeight: 'bold' }
+      style: { border: '2px solid #50ffab', borderRadius: '15px', padding: '10px', background: '#000', color: '#50ffab', fontWeight: 'bold', boxShadow: '0 0 15px rgba(80, 255, 171, 0.2)' }
     };
     setNodes((nds) => nds.concat(newNode));
   };
@@ -458,11 +462,12 @@ const App = () => {
                     onConnect={onConnect}
                     onNodeDoubleClick={onNodeDoubleClick}
                     fitView
+                    style={{ backgroundColor: '#000' }}
                   >
-                    <Background color="#c88cae" gap={40} size={1} opacity={0.05} />
-                    <Controls className="!bg-[#13182a] !border-[#c88cae]/20 !fill-[#f7edf4]" />
-                    <Panel position="top-right" className="bg-[#13182a]/80 p-4 rounded-xl border border-[#c88cae]/10 text-[9px] font-mono text-[#f7edf4]/60 uppercase tracking-widest backdrop-blur-md">
-                      Drag nodes to connect &bull; Double click to edit
+                    <Background color="#ffffff" gap={40} size={1} opacity={0.15} variant="grid" />
+                    <Controls className="!bg-[#ffffff] !border-[#000000] !fill-[#000000]" />
+                    <Panel position="top-right" className="bg-[#ffffff]/10 p-4 rounded-xl border border-[#ffffff]/20 text-[9px] font-mono text-[#ffffff] uppercase tracking-widest backdrop-blur-md">
+                      Interactive Simulation Canvas &bull; Monochrome Edition
                     </Panel>
                   </ReactFlow>
                 </div>
