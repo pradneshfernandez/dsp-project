@@ -1,10 +1,10 @@
 import os
 import logging
 from langchain_google_genai import ChatGoogleGenerativeAI
-try:
-    from src.utils.config import GEMINI_API_KEY
-except ImportError:
-    GEMINI_API_KEY = "AIzaSyAzk4ynexEaEGjH7jmSGBkAeF1y4rtdFoI"
+from dotenv import load_dotenv
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 logger = logging.getLogger(__name__)
 

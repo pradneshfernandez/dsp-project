@@ -27,6 +27,8 @@ const App = () => {
 - **Impact**: S: Safety, O: Operational, F: Financial, P: Privacy
 - **Feasibility**: High, Medium, Low, Very Low
 - **Risk Calculation**: Impact x Feasibility`);
+  const [selectedRisk, setSelectedRisk] = useState(null);
+  const [isApplying, setIsApplying] = useState(false);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -137,6 +139,30 @@ const App = () => {
       style: { background: '#13182a', color: '#f7edf4', border: '1px solid #c88cae44', borderRadius: '12px', fontSize: '10px', padding: '10px', fontWeight: 'bold' }
     };
     setNodes((nds) => nds.concat(newNode));
+  };
+
+  const applyMitigation = async (risk) => {
+    setIsApplying(true);
+    await new Promise(r => setTimeout(r, 2000)); // Visual Simulation Delay
+
+    setResults(prev => {
+      const newMatrix = prev.tara.risk_matrix.map(r => {
+        if (r.asset === risk.asset && r.threat === risk.threat) {
+          const newScore = Math.max(1, r.risk_score - (r.reduction_score || 5));
+          return {
+            ...r,
+            risk_score: newScore,
+            applied: true,
+            hex_color: newScore > 10 ? '#FF4D4D' : newScore > 5 ? '#ffcc00' : '#4CAF50'
+          };
+        }
+        return r;
+      });
+      return { ...prev, tara: { ...prev.tara, risk_matrix: newMatrix } };
+    });
+
+    setIsApplying(false);
+    setSelectedRisk(null);
   };
 
   const onNodeDoubleClick = (_, node) => {
@@ -376,18 +402,105 @@ const App = () => {
                     </thead>
                     <tbody>
                       {results.tara.risk_matrix?.map((row, i) => (
-                        <tr key={i} className="border-b border-[#c88cae]/10 hover:bg-[#c88cae]/5 transition-all last:border-0 group">
+                        <tr
+                          key={i}
+                          onClick={() => setSelectedRisk(row)}
+                          className="border-b border-[#c88cae]/10 hover:bg-[#c88cae]/5 transition-all last:border-0 group cursor-pointer"
+                        >
                           <td className="p-8 text-[#f7edf4] font-bold">{row.asset}</td>
                           <td className="p-8 text-[#f7edf4]/60 italic">{row.threat}</td>
-                          <td className="p-8 text-center font-black text-[#f7edf4] text-2xl">{row.risk_score}</td>
+                          <td className="p-8 text-center font-black text-[#f7edf4] text-2xl">
+                            <motion.span
+                              key={row.risk_score}
+                              initial={{ scale: 1.5, color: '#fff' }}
+                              animate={{ scale: 1, color: '#f7edf4' }}
+                            >
+                              {row.risk_score}
+                            </motion.span>
+                          </td>
                           <td className="p-8 text-center">
-                            <span className="px-6 py-2 rounded-full text-[9px] font-black tracking-[0.2em] shadow-2xl inline-block" style={{ backgroundColor: row.hex_color || '#c88cae', color: "#080812" }}>{row.risk_score > 10 ? 'CRITICAL' : 'ELEVATED'}</span>
+                            <span
+                              className="px-6 py-2 rounded-full text-[9px] font-black tracking-[0.2em] shadow-2xl inline-block transition-colors duration-1000"
+                              style={{ backgroundColor: row.hex_color || '#c88cae', color: "#080812" }}
+                            >
+                              {row.risk_score > 10 ? 'CRITICAL' : row.risk_score > 5 ? 'ELEVATED' : 'SECURE'}
+                            </span>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Neural Drill-down Overlay */}
+                <AnimatePresence>
+                  {selectedRisk && (
+                    <motion.div
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-[300] flex items-center justify-center p-20 bg-[#080812]/80 backdrop-blur-xl"
+                    >
+                      <motion.div
+                        initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+                        className="bg-[#13182a] border border-[#c88cae]/20 rounded-[60px] p-16 max-w-3xl w-full relative shadow-2xl overflow-hidden"
+                      >
+                        {/* Decorative Background */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#c88cae]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+
+                        <button onClick={() => setSelectedRisk(null)} className="absolute top-10 right-10 text-[#f7edf4]/40 hover:text-[#c88cae]"><X size={24} /></button>
+
+                        <div className="mb-12">
+                          <span className="text-[10px] font-mono text-[#c88cae] uppercase tracking-[0.5em] mb-4 block">Neural Drill-down</span>
+                          <h3 className="text-4xl font-black tracking-tighter mb-4 uppercase">{selectedRisk.asset} <span className="text-[#c88cae]/40">&bull;</span> {selectedRisk.threat}</h3>
+                          <div className="flex gap-4 items-center">
+                            <div className="px-4 py-1 bg-[#c88cae]/10 border border-[#c88cae]/20 rounded-full text-[10px] font-mono text-[#c88cae] uppercase tracking-widest">
+                              Score: {selectedRisk.risk_score}
+                            </div>
+                            {selectedRisk.applied && (
+                              <div className="flex items-center gap-2 text-[#4CAF50] text-[10px] font-bold uppercase tracking-widest">
+                                <ShieldCheck size={14} /> Mitigation Active
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="space-y-10">
+                          <div>
+                            <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.3em] mb-4 flex items-center gap-3"><Layers size={16} /> Asset Vulnerability</h4>
+                            <p className="text-[#f7edf4]/60 text-sm leading-relaxed font-mono bg-[#080812]/40 p-6 rounded-3xl border border-[#c88cae]/5">
+                              {selectedRisk.description || "Synthesizing deep architecture analysis... This threat targets the internal communication bus of the specified asset, potentially allowing unauthorized command injection or state manipulation."}
+                            </p>
+                          </div>
+
+                          {!selectedRisk.applied ? (
+                            <div className="p-10 bg-[#c88cae]/5 border border-[#c88cae]/20 rounded-[40px]">
+                              <h4 className="text-[11px] font-black text-[#c88cae] uppercase tracking-[0.3em] mb-6 flex items-center gap-3"><Zap size={16} /> Suggested Neural Patch</h4>
+                              <p className="text-[#f7edf4] text-sm font-bold mb-8">{selectedRisk.mitigation || "Implement hardware-backed cryptographic signatures (AES-GCM 256) for all control messages."}</p>
+
+                              <button
+                                onClick={() => applyMitigation(selectedRisk)}
+                                disabled={isApplying}
+                                className="w-full py-6 bg-[#c88cae] text-[#080812] rounded-[30px] font-black uppercase tracking-[0.3em] text-xs hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-4 group"
+                              >
+                                {isApplying ? (
+                                  <>Applying Neural Patch <div className="w-4 h-4 border-2 border-[#080812] border-t-transparent rounded-full animate-spin" /></>
+                                ) : (
+                                  <>Apply Countermeasure <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" /></>
+                                )}
+                              </button>
+                              <p className="mt-6 text-[9px] text-[#f7edf4]/30 text-center uppercase tracking-widest font-mono">Estimated Risk Reduction: -{selectedRisk.reduction_score || 8} Points</p>
+                            </div>
+                          ) : (
+                            <div className="p-10 bg-[#4CAF50]/10 border border-[#4CAF50]/20 rounded-[40px] text-center">
+                              <ShieldCheck size={48} className="text-[#4CAF50] mx-auto mb-6" />
+                              <h4 className="text-xl font-black text-[#4CAF50] uppercase tracking-[0.2em] mb-4">Integrity Verified</h4>
+                              <p className="text-[#f7edf4]/60 text-[10px] font-mono leading-relaxed uppercase tracking-wider">The suggested mitigation has been applied to the neural simulation. The newly calculated risk score reflects the enhanced security posture.</p>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Graphs */}
                 <div className="grid grid-cols-2 gap-16">

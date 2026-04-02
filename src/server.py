@@ -1,4 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
+from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -7,6 +8,8 @@ import json
 import os
 import asyncio
 import logging
+from dotenv import load_dotenv
+load_dotenv()
 
 from src.pipeline.orchestrator import run_parallel_orchestrator
 from src.pipeline.models import init_db, get_db, AnalysisResult
@@ -83,13 +86,17 @@ async def analyze_system_text(request: TaraTextRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/history")
-async def get_history():
+from src.pipeline.supabase_client import fetch_history as fetch_supabase_history
+
+@app.get("/api/history")
+async def get_history(db: Session = Depends(get_db)):
     try:
-        from src.pipeline.models import SessionLocal
-        db = SessionLocal()
-        results = db.query(AnalysisResult).order_by(AnalysisResult.timestamp.desc()).limit(20).all()
-        db.close()
+        # 1. Try Supabase first if configured
+        if os.getenv("SUPABASE_KEY"):
+            return fetch_supabase_history(limit=10)
+        
+        # 2. Fallback to local SQLAlchemy/SQLite
+        results = db.query(AnalysisResult).order_by(AnalysisResult.timestamp.desc()).limit(10).all()
         return [
             {
                 "id": r.id,
@@ -101,6 +108,7 @@ async def get_history():
             } for r in results
         ]
     except Exception as e:
+        logger.error(f"History Fetch Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

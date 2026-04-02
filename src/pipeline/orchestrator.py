@@ -5,6 +5,8 @@ import re
 from langchain_core.prompts import PromptTemplate
 from src.utils.llm_client import get_llm
 from src.pipeline.models import SessionLocal, AnalysisResult
+from src.pipeline.supabase_client import save_analysis as save_to_supabase
+import os
 
 def run_asset_agent(sys_content):
     """Gemma 3 27B: Parses specs and lists HW/SW/Data assets."""
@@ -65,7 +67,15 @@ Return the final response as a structured JSON object ONLY. No markdown wrapping
   "header": {{"system_name": "...", "risk_level": "CRITICAL"}},
   "dashboard_metrics": {{"total_threats": 0, "avg_feasibility": 0.0}},
   "risk_matrix": [
-    {{"asset": "...", "threat": "...", "risk_score": 12, "hex_color": "#FF4D4D"}}
+    {{
+      "asset": "...", 
+      "threat": "...", 
+      "risk_score": 12, 
+      "hex_color": "#FF4D4D",
+      "description": "Detailed explanation of how the threat manifests in this architecture.",
+      "mitigation": "Specific step-by-step fix (e.g., 'Implement TLS 1.3 with Hardware Root of Trust').",
+      "reduction_score": 8
+    }}
   ],
   "attack_tree": "digraph G {{ rankdir=TB; node [shape=box]; A -> B; }}",
   "audit_summary": "Final 1-paragraph sign-off from Chief Auditor."
@@ -95,13 +105,25 @@ Constraints:
         
         # Save to Database
         try:
+            # 1. Try Supabase first if configured
+            if os.getenv("SUPABASE_KEY"):
+                save_to_supabase({
+                    "system_name": data.get("header", {}).get("system_name", "Unknown System"),
+                    "risk_level": data.get("header", {}).get("risk_level", "UNKNOWN"),
+                    "total_threats": data.get("dashboard_metrics", {}).get("total_threats", 0),
+                    "system_design": sys_content,
+                    "risk_rubric": "N/A",
+                    "raw_data": data
+                })
+            
+            # 2. Local fallback
             db = SessionLocal()
             new_result = AnalysisResult(
                 system_name=data.get("header", {}).get("system_name", "Unknown System"),
                 risk_level=data.get("header", {}).get("risk_level", "UNKNOWN"),
                 total_threats=data.get("dashboard_metrics", {}).get("total_threats", 0),
                 system_design=sys_content,
-                risk_rubric="N/A", # Will update when rubric is fully supported as text
+                risk_rubric="N/A",
                 raw_data=data
             )
             db.add(new_result)
