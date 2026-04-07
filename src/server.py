@@ -157,7 +157,7 @@ async def chat_with_analysis(request: ChatRequest):
 
         llm = ChatGroq(
             groq_api_key=groq_key,
-            model_name="llama-3.1-70b-versatile",
+            model_name="llama-3.3-70b-versatile",
             temperature=0.2
         )
 
