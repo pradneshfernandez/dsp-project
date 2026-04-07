@@ -4,7 +4,7 @@ import {
     PieChart, Pie, Cell, ScatterChart, Scatter, XAxis, YAxis,
     CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
-import { ShieldCheck, Database, Layers, Activity, X, ChevronRight, Zap, Target, FileText, Search, User, Monitor } from 'lucide-react';
+import { ShieldCheck, Database, Layers, Activity, X, ChevronRight, Zap, Target, FileText, Search, User, Monitor, Network } from 'lucide-react';
 
 const CHART_COLORS = ['#c88cae', '#4CAF50', '#FF4D4D', '#ffcc00', '#00bcd4', '#9c27b0'];
 
@@ -101,36 +101,52 @@ export default function ResultDashboard({ results, setView, applyMitigation, isA
                         <div className="flex justify-between items-center mb-4 shrink-0">
                             <h3 className="text-[10px] font-bold text-[#f7edf4] uppercase tracking-[0.2em] flex items-center gap-2"><Activity size={14} className="text-[#c88cae]" /> Threat Mapping Distro</h3>
                         </div>
-                        <div className="flex-1 w-full min-h-0 relative">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={getAssetDistribution()}
-                                        cx="50%" cy="50%"
-                                        innerRadius="60%" outerRadius="80%"
-                                        padAngle={5} dataKey="value"
-                                        onClick={(data) => setActiveFilter(activeFilter === data.name ? null : data.name)}
-                                        className="cursor-pointer outline-none transition-all duration-300"
-                                        animationDuration={800}
+                        <div className="flex-1 w-full min-h-0 relative flex flex-col items-center pb-8">
+                            <div className="flex-1 w-full relative">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={getAssetDistribution()}
+                                            cx="50%" cy="50%"
+                                            innerRadius="60%" outerRadius="80%"
+                                            padAngle={5} dataKey="value"
+                                            onClick={(data) => setActiveFilter(activeFilter === data.name ? null : data.name)}
+                                            className="cursor-pointer outline-none transition-all duration-300"
+                                            animationDuration={800}
+                                        >
+                                            {getAssetDistribution().map((entry, index) => (
+                                                <Cell
+                                                    key={`cell-${index}`}
+                                                    fill={CHART_COLORS[index % CHART_COLORS.length]}
+                                                    opacity={activeFilter && activeFilter !== entry.name ? 0.2 : 1}
+                                                    stroke="rgba(0,0,0,0.5)"
+                                                    strokeWidth={2}
+                                                />
+                                            ))}
+                                        </Pie>
+                                        <RechartsTooltip
+                                            contentStyle={{ backgroundColor: '#080812', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '8px' }}
+                                            itemStyle={{ color: '#f7edf4', fontSize: '10px', textTransform: 'uppercase' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            {/* Legend */}
+                            <div className="w-full flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 px-2">
+                                {getAssetDistribution().map((entry, index) => (
+                                    <div
+                                        key={`legend-${index}`}
+                                        onClick={() => setActiveFilter(activeFilter === entry.name ? null : entry.name)}
+                                        className={`flex items-center gap-1.5 cursor-pointer transition-opacity ${activeFilter && activeFilter !== entry.name ? 'opacity-30' : 'opacity-100 hover:opacity-80'}`}
                                     >
-                                        {getAssetDistribution().map((entry, index) => (
-                                            <Cell
-                                                key={`cell-${index}`}
-                                                fill={CHART_COLORS[index % CHART_COLORS.length]}
-                                                opacity={activeFilter && activeFilter !== entry.name ? 0.2 : 1}
-                                                stroke="rgba(0,0,0,0.5)"
-                                                strokeWidth={2}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <RechartsTooltip
-                                        contentStyle={{ backgroundColor: '#080812', border: '1px solid rgba(200,140,174,0.3)', borderRadius: '8px' }}
-                                        itemStyle={{ color: '#f7edf4', fontSize: '10px', textTransform: 'uppercase' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
+                                        <div className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.2)]" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}></div>
+                                        <span className="text-[8px] font-mono text-[#f7edf4] uppercase tracking-widest">{entry.name}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <p className="text-[8px] mt-2 text-[#f7edf4]/40 font-mono uppercase tracking-widest text-center absolute bottom-4 left-0 w-full shrink-0">Click Segment to Isolate</p>
+                        <p className="text-[8px] mt-2 text-[#f7edf4]/40 font-mono uppercase tracking-widest text-center absolute bottom-2 left-0 w-full shrink-0">Click Segment to Isolate</p>
                     </div>
                 </div>
 
@@ -265,6 +281,20 @@ export default function ResultDashboard({ results, setView, applyMitigation, isA
                                         <p className="text-[11px] text-[#f7edf4]/70 leading-relaxed font-sans">{selectedRisk.description || "The identified threat vector breaches the asset perimeter, establishing anomalous lateral communication pathways."}</p>
                                     </div>
 
+                                    <div className="bg-[#080812] border border-[#c88cae]/10 p-5 rounded-xl">
+                                        <h4 className="text-[9px] text-[#c88cae] uppercase tracking-[0.2em] font-bold mb-3 flex items-center gap-2"><Network size={12} /> System Attack Path & Component Context</h4>
+                                        <div className="flex items-center flex-wrap gap-2 text-[10px] text-white font-mono uppercase bg-[#13182a] py-2 px-3 rounded-md border border-[#c88cae]/5">
+                                            <span className="text-[#f7edf4]/70">{selectedRisk.system_domain || "External Interface"}</span>
+                                            <ChevronRight size={10} className="text-[#c88cae]" />
+                                            <span className="text-[#f7edf4]/90">{selectedRisk.component || "Gateway Module"}</span>
+                                            <ChevronRight size={10} className="text-[#c88cae]" />
+                                            <span className="text-[#FF4D4D] font-black underline decoration-[#FF4D4D]/30 underline-offset-4">{selectedRisk.asset}</span>
+                                        </div>
+                                        <p className="text-[9px] text-[#f7edf4]/50 mt-3 font-sans leading-relaxed border-l-2 border-[#c88cae]/30 pl-3">
+                                            {selectedRisk.attack_path || `Threat actor originates from ${selectedRisk.system_domain || "External Interface"}, pivots through the intermediate ${selectedRisk.component || "Gateway Module"}, and directly injects malicious payloads into the ${selectedRisk.asset}.`}
+                                        </p>
+                                    </div>
+
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="bg-[#080812] border border-[#c88cae]/10 p-4 rounded-xl">
                                             <p className="text-[9px] text-[#c88cae] uppercase tracking-[0.2em] font-bold mb-1">Feasibility Index</p>
@@ -283,13 +313,21 @@ export default function ResultDashboard({ results, setView, applyMitigation, isA
 
                                         {!selectedRisk.applied ? (
                                             <>
-                                                <div className="flex items-center gap-2 mb-4">
+                                                <div className="flex items-center gap-2 mb-4 mt-1">
                                                     <Zap size={14} className="text-[#ffcc00]" />
                                                     <h4 className="text-[10px] text-[#ffcc00] uppercase tracking-[0.2em] font-bold">Countermeasure Protocol</h4>
                                                 </div>
-                                                <p className="text-[10px] text-[#f7edf4] font-mono leading-relaxed mb-6 flex-1">
+                                                <p className="text-[10px] text-[#f7edf4] font-mono leading-relaxed mb-4">
                                                     {selectedRisk.mitigation || "Deploy strict cryptographic validation on incoming data payloads."}
                                                 </p>
+
+                                                {/* Mechanism of Action */}
+                                                <div className="bg-[#ffcc00]/5 border border-[#ffcc00]/20 rounded-lg p-3 mb-6 flex-1 flex flex-col justify-center">
+                                                    <h5 className="text-[8px] text-[#ffcc00] uppercase tracking-[0.2em] font-bold mb-1.5 opacity-80">Mechanism of Action</h5>
+                                                    <p className="text-[9px] text-[#f7edf4]/70 font-sans leading-relaxed">
+                                                        {selectedRisk.mitigation_mechanism || "This protocol intercepts and drops malformed or unauthenticated packets at the transport layer before they reach the ECU logical processing core, ensuring downstream components cannot be compromised by sequence injection."}
+                                                    </p>
+                                                </div>
 
                                                 <button
                                                     onClick={() => applyMitigation(selectedRisk)}
@@ -311,9 +349,15 @@ export default function ResultDashboard({ results, setView, applyMitigation, isA
                                                 >
                                                     <ShieldCheck size={32} className="text-[#4CAF50]" />
                                                 </motion.div>
-                                                <div>
-                                                    <h4 className="text-[12px] font-black text-[#4CAF50] uppercase tracking-[0.2em] mb-2">Perimeter Secured</h4>
-                                                    <p className="text-[#f7edf4]/60 text-[9px] font-mono leading-relaxed uppercase tracking-wider">The protocol was successfully enforced. Risk topology recalculation complete.</p>
+                                                <div className="w-full">
+                                                    <h4 className="text-[12px] font-black text-[#4CAF50] uppercase tracking-[0.2em] mb-2 text-center">Perimeter Secured</h4>
+                                                    <p className="text-[#f7edf4]/60 text-[9px] font-mono leading-relaxed uppercase tracking-wider mb-5 text-center">The protocol was successfully enforced. Risk topology recalculation complete.</p>
+                                                    <div className="bg-[#4CAF50]/5 border border-[#4CAF50]/20 rounded-lg p-3 text-left w-full mt-2 shadow-[inset_0_0_15px_rgba(76,175,80,0.05)]">
+                                                        <span className="text-[8px] block text-[#4CAF50] uppercase tracking-[0.2em] font-bold mb-1.5 opacity-80">Active Protection Engaged</span>
+                                                        <span className="text-[9px] text-[#f7edf4]/80 font-sans leading-relaxed block border-l-2 border-[#4CAF50]/30 pl-2">
+                                                            {selectedRisk.mitigation_mechanism || "Malicious traffic is now actively dropped at the network boundary, effectively neutralizing the anomaly before logical processing layers."}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                                 <button className="flex items-center gap-2 mt-4 px-4 py-2 border border-[#4CAF50]/30 rounded-full text-[#4CAF50] text-[9px] hover:bg-[#4CAF50]/10 transition-colors uppercase font-bold tracking-widest"><FileText size={12} /> View Audit Log</button>
                                             </div>
